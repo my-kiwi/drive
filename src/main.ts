@@ -1,45 +1,43 @@
 import * as THREE from 'three';
+import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js';
 
-const createCube = (size: number, color: number) => {
-  const geometry = new THREE.BoxGeometry(size, size, size);
-  const material = new THREE.MeshBasicMaterial({ color });
-  return new THREE.Mesh(geometry, material);
-};
+import { createCar } from './car';
+import { createGrid } from './grid';
+import { createAmbiantLight, createDirectionalLight } from './lights';
+import { createCamera, createOrbitalControls } from './camera';
+import { createRenderer } from './renderer';
 
-const createLine = () => {
-  const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
-  const points = [];
-  points.push(new THREE.Vector3(-1, 0, 0));
-  points.push(new THREE.Vector3(0, 1, 0));
-  points.push(new THREE.Vector3(1, 0, 0));
-  const geometry = new THREE.BufferGeometry().setFromPoints(points);
-  return new THREE.Line(geometry, material);
-};
-
-// Basic setup
-const aspectRatio = window.innerWidth / window.innerHeight;
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
-
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
+const renderer = createRenderer();
 document.body.appendChild(renderer.domElement);
 
-// Create a cube
-const cube = createCube(1, 0x00ff00);
-scene.add(cube);
+const camera = createCamera();
 
-// draw a line
-const line = createLine();
-scene.add(line);
+// free view controls, using mouse to orbit around the scene
+createOrbitalControls(camera, renderer.domElement);
 
-// Position the camera
-camera.position.z = 5;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x333333);
+
+// adds some reflections
+scene.environment = new HDRLoader().load('textures/venice_sunset_1k.hdr');
+scene.environment.mapping = THREE.EquirectangularReflectionMapping;
+// and some lights
+scene.add(createAmbiantLight());
+scene.add(createDirectionalLight());
+
+// adds fog in the distance
+scene.fog = new THREE.Fog(0x333333, 10, 15);
+
+// debugging grid
+const grid = createGrid();
+scene.add(grid);
+
+// main subject: the car
+const car = await createCar();
+scene.add(car);
 
 // Animation loop
 const animate = () => {
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
   renderer.render(scene, camera);
 };
 renderer.setAnimationLoop(animate);
