@@ -6,7 +6,7 @@ import { createGrid } from './grid';
 import { createAmbiantLight, createDirectionalLight } from './lights';
 import { createCamera, createOrbitalControls } from './camera';
 import { createRenderer } from './renderer';
-import { createControlsUI } from './controls-ui';
+import { createControlsUI } from './controls/controls-ui';
 
 const renderer = createRenderer();
 // Add touch/keyboard controls UI
