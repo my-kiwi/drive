@@ -39,5 +39,16 @@ scene.add(car);
 // Animation loop
 const animate = () => {
   renderer.render(scene, camera);
+  // controls.update(); ???
+  const time = - performance.now() / 1000;
+  const wheels = [
+    car.getObjectByName('wheel_fl'),
+    car.getObjectByName('wheel_fr'),
+    car.getObjectByName('wheel_rl'),
+    car.getObjectByName('wheel_rr'),
+  ];
+  for (let i = 0; i < wheels.length; i++) {
+    wheels[i].rotation.x = time * Math.PI * 2;
+  }
 };
 renderer.setAnimationLoop(animate);

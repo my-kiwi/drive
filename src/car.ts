@@ -4,18 +4,23 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
 type CarModelObjetKey =
   | 'body'
-  | 'glass'
+  | 'glass' 
   | 'rim_fl'
   | 'rim_fr'
   | 'rim_rl'
   | 'rim_rr'
-  | 'trim';
+  | 'trim' 
+  | 'wheel_fl' // front left
+  | 'wheel_fr' // front right
+  | 'wheel_rl' // rear left
+  | 'wheel_rr'; // rear right
+
 
 type CarModel = Omit<THREE.Object3D<THREE.Object3DEventMap>, 'getObjectByName'> & {
   getObjectByName(key: CarModelObjetKey): THREE.Mesh;
 }
 
-export const createCar = async () => {
+export const createCar = async (): Promise<CarModel> => {
   const loader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
   dracoLoader.setDecoderPath('./libs/draco/gltf/');
