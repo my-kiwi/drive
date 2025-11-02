@@ -6,11 +6,11 @@ import { createGrid } from './grid';
 import { createAmbiantLight, createDirectionalLight } from './lights';
 import { createCamera, createOrbitalControls } from './camera';
 import { createRenderer } from './renderer';
-import { createDebugUI } from './debug';
+import { createControlsUI } from './controls-ui';
 
 const renderer = createRenderer();
-// Add debug overlay
-createDebugUI();
+// Add touch/keyboard controls UI
+createControlsUI();
 document.body.appendChild(renderer.domElement);
 
 const camera = createCamera();
