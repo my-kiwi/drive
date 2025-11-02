@@ -16,10 +16,11 @@ type CarModelObjetKey =
   | 'wheel_rl' // rear left
   | 'wheel_rr'; // rear right
 
-
 type CarModel = Omit<THREE.Object3D<THREE.Object3DEventMap>, 'getObjectByName'> & {
+  // "key" is defined but never used => it's a type definition stupid linter
+  // eslint-disable-next-line no-unused-vars
   getObjectByName(key: CarModelObjetKey): THREE.Mesh;
-}
+};
 
 export const createCar = async () => {
   const model = await createCarModel();
@@ -36,11 +37,11 @@ export const createCar = async () => {
 
     // Calculate wheel rotation based on velocity
     const wheelCircumference = 0.5;
-    const rotationAngle = (physics.velocity * deltaTime) * (Math.PI * 2 / wheelCircumference);
+    const rotationAngle = physics.velocity * deltaTime * ((Math.PI * 2) / wheelCircumference);
 
     // Create quaternions for our rotations
-    const spinQ = new THREE.Quaternion();  // For wheel spinning (forward/backward)
-    const steerQ = new THREE.Quaternion();  // For wheel steering (left/right)
+    const spinQ = new THREE.Quaternion(); // For wheel spinning (forward/backward)
+    const steerQ = new THREE.Quaternion(); // For wheel steering (left/right)
 
     // Apply rotations to rear wheels (only spin, no steering)
     wheelRL.rotation.x -= rotationAngle;
@@ -61,33 +62,33 @@ export const createCar = async () => {
 
     // Update car position and orientation
     const forward = new THREE.Vector3(
-      -Math.sin(physics.orientation),  // Flipped sign
+      -Math.sin(physics.orientation), // Flipped sign
       0,
-      -Math.cos(physics.orientation)   // Flipped sign
+      -Math.cos(physics.orientation) // Flipped sign
     );
-    
+
     // Move car based on velocity and orientation
     model.position.add(forward.multiplyScalar(physics.velocity * deltaTime));
     model.rotation.y = physics.orientation;
-  }
+  };
   return {
-    model, 
+    model,
     update,
   };
-}
+};
 
 export interface VehiclePhysics {
-  velocity: number;          // Current velocity
-  acceleration: number;      // Current acceleration
-  orientation: number;       // Current orientation in radians
-  steering: number;         // Current steering angle in radians
-  maxVelocity: number;      // Maximum velocity
-  accelerationRate: number;  // How fast we gain speed
-  brakeRate: number;        // How fast we brake
-  frictionRate: number;     // How fast we slow down naturally
+  velocity: number; // Current velocity
+  acceleration: number; // Current acceleration
+  orientation: number; // Current orientation in radians
+  steering: number; // Current steering angle in radians
+  maxVelocity: number; // Maximum velocity
+  accelerationRate: number; // How fast we gain speed
+  brakeRate: number; // How fast we brake
+  frictionRate: number; // How fast we slow down naturally
   maxSteeringAngle: number; // Maximum steering angle in radians
-  steeringSpeed: number;    // How fast the wheels turn
-  returnSpeed: number;      // How fast wheels return to center
+  steeringSpeed: number; // How fast the wheels turn
+  returnSpeed: number; // How fast wheels return to center
 }
 
 export function createVehiclePhysics(): VehiclePhysics {
@@ -96,17 +97,21 @@ export function createVehiclePhysics(): VehiclePhysics {
     acceleration: 0,
     orientation: 0,
     steering: 0,
-    maxVelocity: 4,        // Units per second
-    accelerationRate: 4,    // Units per second squared
-    brakeRate: 6,          // Units per second squared
-    frictionRate: 2,       // Units per second squared
+    maxVelocity: 4, // Units per second
+    accelerationRate: 4, // Units per second squared
+    brakeRate: 6, // Units per second squared
+    frictionRate: 2, // Units per second squared
     maxSteeringAngle: Math.PI / 4, // 45 degrees
-    steeringSpeed: 2.5,    // Radians per second
-    returnSpeed: 5.0,      // Return to center speed
+    steeringSpeed: 2.5, // Radians per second
+    returnSpeed: 5.0, // Return to center speed
   };
 }
 
-export function updateVehiclePhysics(physics: VehiclePhysics, controls: Controls, deltaTime: number): void {
+export function updateVehiclePhysics(
+  physics: VehiclePhysics,
+  controls: Controls,
+  deltaTime: number
+): void {
   // Handle acceleration based on controls
   if (controls.up) {
     physics.acceleration = physics.accelerationRate;
@@ -125,7 +130,10 @@ export function updateVehiclePhysics(physics: VehiclePhysics, controls: Controls
   physics.velocity += physics.acceleration * deltaTime;
 
   // Clamp velocity to max speed
-  physics.velocity = Math.max(-physics.maxVelocity, Math.min(physics.maxVelocity, physics.velocity));
+  physics.velocity = Math.max(
+    -physics.maxVelocity,
+    Math.min(physics.maxVelocity, physics.velocity)
+  );
 
   // If we're nearly stopped, just stop
   if (Math.abs(physics.velocity) < 0.01) {
@@ -133,10 +141,11 @@ export function updateVehiclePhysics(physics: VehiclePhysics, controls: Controls
   }
 
   // Handle steering
-  const targetSteering = 
-    controls.left ? physics.maxSteeringAngle :
-    controls.right ? -physics.maxSteeringAngle :
-    0;
+  const targetSteering = controls.left
+    ? physics.maxSteeringAngle
+    : controls.right
+      ? -physics.maxSteeringAngle
+      : 0;
 
   // Smoothly interpolate steering
   if (targetSteering !== physics.steering) {
@@ -219,4 +228,3 @@ const createCarModel = async (): Promise<CarModel> => {
   carModel.position.set(0, 0, 0);
   return carModel;
 };
-
