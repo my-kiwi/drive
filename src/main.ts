@@ -7,6 +7,7 @@ import { createAmbiantLight, createDirectionalLight } from './lights';
 import { createCamera, createOrbitalControls } from './camera';
 import { createRenderer } from './renderer';
 import { createControlsUI } from './controls/controls-ui';
+import { controls } from './controls/controls';
 
 const renderer = createRenderer();
 // Add touch/keyboard controls UI
@@ -37,22 +38,18 @@ scene.add(grid);
 
 // main subject: the car
 const car = await createCar();
-scene.add(car);
+scene.add(car.model);
+
+let lastTime = performance.now();
 
 // Animation loop
 const animate = () => {
+  const currentTime = performance.now();
+  const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
+  lastTime = currentTime;
+  car.update(deltaTime, controls);
+
   renderer.render(scene, camera);
-  // controls.update(); ???
-  const time = - performance.now() / 1000;
-  const wheels = [
-    car.getObjectByName('wheel_fl'),
-    car.getObjectByName('wheel_fr'),
-    car.getObjectByName('wheel_rl'),
-    car.getObjectByName('wheel_rr'),
-  ];
-  for (let i = 0; i < wheels.length; i++) {
-    wheels[i].rotation.x = time * Math.PI * 2;
-  }
 };
 renderer.setAnimationLoop(animate);
 
