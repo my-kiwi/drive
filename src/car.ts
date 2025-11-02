@@ -2,6 +2,19 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
+type CarModelObjetKey =
+  | 'body'
+  | 'glass'
+  | 'rim_fl'
+  | 'rim_fr'
+  | 'rim_rl'
+  | 'rim_rr'
+  | 'trim';
+
+type CarModel = Omit<THREE.Object3D<THREE.Object3DEventMap>, 'getObjectByName'> & {
+  getObjectByName(key: CarModelObjetKey): THREE.Mesh;
+}
+
 export const createCar = async () => {
   const loader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
@@ -9,7 +22,7 @@ export const createCar = async () => {
   loader.setDRACOLoader(dracoLoader);
   const gltf = await loader.loadAsync('./models/ferrari.glb');
 
-  const carModel = gltf.scene.children[0];
+  const carModel = gltf.scene.children[0] as CarModel;
 
   // body material
   const bodyMaterial = new THREE.MeshPhysicalMaterial({
@@ -19,7 +32,7 @@ export const createCar = async () => {
     clearcoat: 1.0,
     clearcoatRoughness: 0.03,
   });
-  (carModel.getObjectByName('body') as THREE.Mesh).material = bodyMaterial;
+  carModel.getObjectByName('body').material = bodyMaterial;
 
   // details material
   const detailsMaterial = new THREE.MeshStandardMaterial({
@@ -27,11 +40,9 @@ export const createCar = async () => {
     metalness: 1.0,
     roughness: 0.5,
   });
-  (carModel.getObjectByName('rim_fl') as THREE.Mesh).material = detailsMaterial;
-  (carModel.getObjectByName('rim_fr') as THREE.Mesh).material = detailsMaterial;
-  (carModel.getObjectByName('rim_rr') as THREE.Mesh).material = detailsMaterial;
-  (carModel.getObjectByName('rim_rl') as THREE.Mesh).material = detailsMaterial;
-  (carModel.getObjectByName('trim') as THREE.Mesh).material = detailsMaterial;
+  for (const key of ['rim_fl', 'rim_fr', 'rim_rr', 'rim_rl', 'trim'] as CarModelObjetKey[]) {
+    carModel.getObjectByName(key).material = detailsMaterial;
+  }
 
   // glass material
   const glassMaterial = new THREE.MeshPhysicalMaterial({
@@ -40,7 +51,7 @@ export const createCar = async () => {
     roughness: 0,
     transmission: 1.0,
   });
-  (carModel.getObjectByName('glass') as THREE.Mesh).material = glassMaterial;
+  carModel.getObjectByName('glass').material = glassMaterial;
 
   // shadow
   const shadow = new THREE.TextureLoader().load('models/ferrari_ao.png');
