@@ -6,18 +6,18 @@ import { createGrid } from './grid';
 import { createAmbiantLight, createDirectionalLight } from './lights';
 import { createCamera, createOrbitalControls } from './camera';
 import { createRenderer } from './renderer';
-import { createControlsUI } from './controls/controls-ui';
-import { controls } from './controls/controls';
+import { createControls } from './controls/controls';
 
 const renderer = createRenderer();
-// Add touch/keyboard controls UI
-createControlsUI();
+
 document.body.appendChild(renderer.domElement);
 
 const camera = createCamera();
 
 // free view controls, using mouse to orbit around the scene
 createOrbitalControls(camera, renderer.domElement);
+// car controls
+const controls = createControls();
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x333333);
@@ -47,6 +47,8 @@ const animate = () => {
   const currentTime = performance.now();
   const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
   lastTime = currentTime;
+
+  controls.update();
   car.update(deltaTime, controls);
 
   renderer.render(scene, camera);

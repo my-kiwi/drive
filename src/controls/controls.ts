@@ -1,8 +1,13 @@
+import { isMobileDevice } from '../utils/device';
+import { createControlsUI } from './controls-ui';
+import { createJoystickUI } from './joystick';
+
 export interface Controls {
   left: boolean;
   right: boolean;
   up: boolean;
   down: boolean;
+  update: () => void;
 }
 
 export const controls: Controls = {
@@ -10,6 +15,19 @@ export const controls: Controls = {
   right: false,
   up: false,
   down: false,
+  update: () => {
+    // Placeholder for dynamic update function
+  },
+};
+
+export const createControls = (): Controls => {
+  if (isMobileDevice()) {
+    const updateJoystick = createJoystickUI();
+    controls.update = () => updateJoystick(controls);
+  } else {
+    createControlsUI();
+  }
+  return controls;
 };
 
 function handleKeyDown(event: KeyboardEvent): void {
