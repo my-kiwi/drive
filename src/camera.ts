@@ -1,21 +1,103 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-export const createCamera = () => {
+export interface CameraController {
+  update: () => void;
+  camera: THREE.PerspectiveCamera;
+  // eslint-disable-next-line no-unused-vars
+  setTarget: (target: THREE.Object3D) => void;
+  toggleMode: () => void;
+}
+
+export function createCamera(): CameraController {
   const aspectRatio = window.innerWidth / window.innerHeight;
   const camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
-  camera.position.z = 5;
-  camera.position.y = 2;
-  camera.lookAt(0, 0, 0);
-  return camera;
-};
 
-export const createOrbitalControls = (camera: THREE.Camera, domElement: HTMLElement) => {
-  // Free view controls
-  const controls = new OrbitControls(camera, domElement);
-  controls.maxDistance = 9;
-  controls.maxPolarAngle = THREE.MathUtils.degToRad(90);
-  controls.target.set(0, 0.5, 0);
-  controls.update();
-  return controls;
-};
+  // Initial position
+  camera.position.set(0, 2, 5);
+  camera.lookAt(0, 0, 0);
+
+  // Camera settings
+  const settings = {
+    mode: 'follow' as 'follow' | 'orbit',
+    distance: 4, // Negative distance to position behind car
+    height: 3, // Height above car
+    lookAhead: -2, // Negative value to look ahead of car from behind
+    smoothing: 0.1, // Lower = smoother camera (0-1)
+    rotationSmoothing: 0.25, // Rotation smoothing factor
+  };
+
+  // Orbit controls for free camera mode
+  const orbitControls = new OrbitControls(camera, document.body);
+  orbitControls.maxDistance = 9;
+  orbitControls.maxPolarAngle = THREE.MathUtils.degToRad(90);
+  orbitControls.target.set(0, 0.5, 0);
+  orbitControls.enabled = false; // Start in follow mode
+  orbitControls.update();
+
+  // Target object (the car) and current camera target
+  let target: THREE.Object3D | null = null;
+  const currentTarget = new THREE.Vector3();
+  const currentLookAt = new THREE.Vector3();
+
+  function updateFollowCamera() {
+    if (!target) return;
+
+    // Calculate ideal camera position
+    const targetPos = target.position;
+    const targetDir = new THREE.Vector3(0, 0, 1).applyQuaternion(target.quaternion);
+
+    // Calculate desired camera position (behind and above target)
+    const idealOffset = new THREE.Vector3(
+      targetDir.x * settings.distance, // Removed negative sign
+      settings.height,
+      targetDir.z * settings.distance // Removed negative sign
+    );
+    const idealPosition = targetPos.clone().add(idealOffset);
+
+    // Calculate desired look-at position (ahead of target)
+    const lookAheadOffset = targetDir.clone().multiplyScalar(settings.lookAhead);
+    const idealLookAt = targetPos.clone().add(lookAheadOffset);
+
+    // Smoothly move camera
+    currentTarget.lerp(idealPosition, settings.smoothing);
+    currentLookAt.lerp(idealLookAt, settings.smoothing);
+
+    // Update camera
+    camera.position.copy(currentTarget);
+    camera.lookAt(currentLookAt);
+  }
+
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+  });
+
+  // Return camera controller
+  return {
+    camera,
+    setTarget: (newTarget: THREE.Object3D) => {
+      target = newTarget;
+      // Initialize current positions to prevent camera jump
+      if (target) {
+        currentTarget.copy(camera.position);
+        currentLookAt.copy(target.position);
+      }
+    },
+    toggleMode: () => {
+      settings.mode = settings.mode === 'follow' ? 'orbit' : 'follow';
+      orbitControls.enabled = settings.mode === 'orbit';
+      if (settings.mode === 'orbit') {
+        orbitControls.target.copy(currentLookAt);
+      }
+    },
+    update: () => {
+      if (settings.mode === 'follow') {
+        updateFollowCamera();
+      } else {
+        orbitControls.update();
+      }
+    },
+  };
+}

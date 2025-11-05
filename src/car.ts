@@ -97,9 +97,9 @@ export function createVehiclePhysics(): VehiclePhysics {
     acceleration: 0,
     orientation: 0,
     steering: 0,
-    maxVelocity: 4, // Units per second
-    accelerationRate: 4, // Units per second squared
-    brakeRate: 6, // Units per second squared
+    maxVelocity: 15, // Units per second
+    accelerationRate: 7, // Units per second squared
+    brakeRate: 15, // Units per second squared
     frictionRate: 2, // Units per second squared
     maxSteeringAngle: Math.PI / 4, // 45 degrees
     steeringSpeed: 2.5, // Radians per second

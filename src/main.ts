@@ -4,7 +4,7 @@ import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js';
 import { createCar } from './car';
 import { createGrid } from './grid';
 import { createAmbiantLight, createDirectionalLight } from './lights';
-import { createCamera, createOrbitalControls } from './camera';
+import { createCamera } from './camera';
 import { createRenderer } from './renderer';
 import { createControls } from './controls/controls';
 
@@ -12,12 +12,10 @@ const renderer = createRenderer();
 
 document.body.appendChild(renderer.domElement);
 
-const camera = createCamera();
-
-// free view controls, using mouse to orbit around the scene
-createOrbitalControls(camera, renderer.domElement);
-// car controls
+const cameraController = createCamera();
 const controls = createControls();
+
+// Set the car as the camera target (will be available after car is created)
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x333333);
@@ -40,6 +38,16 @@ scene.add(grid);
 const car = await createCar();
 scene.add(car.model);
 
+// Set car as camera target
+cameraController.setTarget(car.model);
+
+// Add keyboard listener for camera mode toggle
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'c') {
+    cameraController.toggleMode();
+  }
+});
+
 let lastTime = performance.now();
 
 // Animation loop
@@ -50,7 +58,8 @@ const animate = () => {
 
   controls.update();
   car.update(deltaTime, controls);
+  cameraController.update();
 
-  renderer.render(scene, camera);
+  renderer.render(scene, cameraController.camera);
 };
 renderer.setAnimationLoop(animate);
