@@ -25,8 +25,15 @@ scene.background = new THREE.Color(0x333333);
 createEnvironment(scene, renderer as any);
 
 // adds some reflections
-scene.environment = new HDRLoader().load('textures/venice_sunset_1k.hdr');
-scene.environment.mapping = THREE.EquirectangularReflectionMapping;
+// adds some reflections (PMREM-prefiltered for smooth, high-quality reflections)
+const pmremGenerator = new THREE.PMREMGenerator(renderer as any);
+pmremGenerator.compileEquirectangularShader();
+const hdrEquirect = await new HDRLoader().loadAsync('textures/venice_sunset_1k.hdr');
+const env = pmremGenerator.fromEquirectangular(hdrEquirect).texture;
+scene.environment = env;
+// cleanup raw texture and generator
+if ((hdrEquirect as any).dispose) (hdrEquirect as any).dispose();
+pmremGenerator.dispose();
 // and some lights
 scene.add(createAmbiantLight());
 scene.add(createDirectionalLight());
