@@ -7,6 +7,7 @@ import { createAmbiantLight, createDirectionalLight } from './lights';
 import { createCamera } from './camera';
 import { createRenderer } from './renderer';
 import { createControls } from './controls/controls';
+import { createEnvironment } from './environment';
 
 const renderer = createRenderer();
 
@@ -19,6 +20,9 @@ const controls = createControls();
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x333333);
+
+// create sky and road environment
+createEnvironment(scene, renderer as any);
 
 // adds some reflections
 scene.environment = new HDRLoader().load('textures/venice_sunset_1k.hdr');
