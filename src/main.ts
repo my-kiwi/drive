@@ -1,13 +1,15 @@
 import * as THREE from 'three';
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js';
 
-import { createCar } from './car';
+import { createCar } from './3d-objects/car';
 import { createGrid } from './grid';
 import { createAmbiantLight, createDirectionalLight } from './lights';
 import { createCamera } from './camera';
 import { createRenderer } from './renderer';
 import { createControls } from './controls/controls';
 import { createEnvironment } from './environment';
+import { create } from 'domain';
+import { createBuildings } from './3d-objects/buldings';
 
 const renderer = createRenderer();
 
@@ -28,9 +30,11 @@ createEnvironment(scene, renderer as any);
 // adds some reflections (PMREM-prefiltered for smooth, high-quality reflections)
 const pmremGenerator = new THREE.PMREMGenerator(renderer as any);
 pmremGenerator.compileEquirectangularShader();
-const hdrEquirect = await new HDRLoader().loadAsync('textures/venice_sunset_1k.hdr');
+const hdrEquirect = await new HDRLoader().loadAsync('textures/rural_evening_road_2k.hdr');
 const env = pmremGenerator.fromEquirectangular(hdrEquirect).texture;
 scene.environment = env;
+// Use the prefiltered HDR cubemap as the scene background (sky)
+scene.background = env;
 // cleanup raw texture and generator
 if ((hdrEquirect as any).dispose) (hdrEquirect as any).dispose();
 pmremGenerator.dispose();
@@ -39,15 +43,19 @@ scene.add(createAmbiantLight());
 scene.add(createDirectionalLight());
 
 // adds fog in the distance
-scene.fog = new THREE.Fog(0x333333, 10, 15);
+// scene.fog = new THREE.Fog(0x634a3d, 10, 150);
+scene.fog = new THREE.Fog(0x3a3a3a, 10, 50);
 
 // debugging grid
-const grid = createGrid();
-scene.add(grid);
+//const grid = createGrid();
+// scene.add(grid);s
 
 // main subject: the car
 const car = await createCar();
 scene.add(car.model);
+
+const buildings = await createBuildings();
+scene.add(buildings);
 
 // Set car as camera target
 cameraController.setTarget(car.model);
