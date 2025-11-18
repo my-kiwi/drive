@@ -2,13 +2,11 @@ import * as THREE from 'three';
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js';
 
 import { createCar } from './3d-objects/car';
-import { createGrid } from './grid';
 import { createAmbiantLight, createDirectionalLight } from './lights';
 import { createCamera } from './camera';
 import { createRenderer } from './renderer';
 import { createControls } from './controls/controls';
 import { createEnvironment } from './environment';
-import { create } from 'domain';
 import { createBuildings } from './3d-objects/buldings';
 
 const renderer = createRenderer();

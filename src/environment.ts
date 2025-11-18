@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 
 export function createEnvironment(scene: THREE.Scene, renderer: THREE.WebGLRenderer) {
-
   // Match fog color to horizon glow for depth
   scene.fog = new THREE.Fog(new THREE.Color(0x333333), 10, 200);
 
@@ -19,14 +18,14 @@ export function createEnvironment(scene: THREE.Scene, renderer: THREE.WebGLRende
   ctx.fillRect(0, 0, roadCanvas.width, roadCanvas.height);
 
   // Add subtle noise (simple lines) to simulate texture
-//   ctx.strokeStyle = 'rgba(0,0,0,0.03)';
-//   for (let i = 0; i < 3000; i++) {
-//     const x = Math.random() * roadCanvas.width;
-//     ctx.beginPath();
-//     ctx.moveTo(x, 0);
-//     ctx.lineTo(x + (Math.random() - 0.5) * 10, roadCanvas.height);
-//     ctx.stroke();
-//   }
+  //   ctx.strokeStyle = 'rgba(0,0,0,0.03)';
+  //   for (let i = 0; i < 3000; i++) {
+  //     const x = Math.random() * roadCanvas.width;
+  //     ctx.beginPath();
+  //     ctx.moveTo(x, 0);
+  //     ctx.lineTo(x + (Math.random() - 0.5) * 10, roadCanvas.height);
+  //     ctx.stroke();
+  //   }
 
   // Draw center dashed line
   ctx.strokeStyle = 'rgba(255,255,200,0.9)';
