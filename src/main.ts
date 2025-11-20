@@ -25,7 +25,7 @@ scene.background = new THREE.Color(0x333333);
 // create sky and road environment
 createEnvironment(scene);
 
-const texture = await loadTexture('rural_evening_road_2k.hdr');
+const texture = await loadTexture('red-sky-at-night-cirrostratus-skydome_2K.exr');
 scene.environment = texture; // set as scene environment for reflections
 scene.background = texture; // Use the prefiltered HDR cubemap as the scene background (sky)
 
