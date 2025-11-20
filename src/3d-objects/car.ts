@@ -164,7 +164,7 @@ function updateVehiclePhysics(
 }
 
 const createCarModel = async (): Promise<CarModel> => {
-  const gltf = await loadModel('ferrari');
+  const gltf = await loadModel('ferrari.glb');
 
   const carModel = gltf.scene.children[0] as CarModel;
 
