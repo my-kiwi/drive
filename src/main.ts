@@ -34,12 +34,7 @@ scene.add(createAmbiantLight());
 scene.add(createDirectionalLight());
 
 // adds fog in the distance
-// scene.fog = new THREE.Fog(0x634a3d, 10, 150);
 scene.fog = new THREE.Fog(0x3a3a3a, 10, 50);
-
-// debugging grid
-//const grid = createGrid();
-// scene.add(grid);s
 
 // main subject: the car
 const car = await createCar();
