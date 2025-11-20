@@ -1,6 +1,8 @@
 import * as THREE from 'three';
+import { getRenderer } from './renderer';
 
-export function createEnvironment(scene: THREE.Scene, renderer: THREE.WebGLRenderer) {
+export function createEnvironment(scene: THREE.Scene) {
+  const renderer = getRenderer();
   // Match fog color to horizon glow for depth
   scene.fog = new THREE.Fog(new THREE.Color(0x333333), 10, 200);
 

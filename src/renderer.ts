@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 
+let renderer: THREE.WebGLRenderer;
+
 export const createRenderer = () => {
-  const renderer = new THREE.WebGLRenderer({
+  renderer = new THREE.WebGLRenderer({
     antialias: true,
   });
 
@@ -10,3 +12,10 @@ export const createRenderer = () => {
   renderer.toneMappingExposure = 0.85;
   return renderer;
 };
+
+export const getRenderer = (): THREE.WebGLRenderer => {
+  if (!renderer) {
+    createRenderer();
+  }
+  return renderer;
+}

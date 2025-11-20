@@ -8,6 +8,7 @@ import { createRenderer } from './renderer';
 import { createControls } from './controls/controls';
 import { createEnvironment } from './environment';
 import { createBuildings } from './3d-objects/buldings';
+import { loadTexture } from './utils/texture-loader';
 
 const renderer = createRenderer();
 
@@ -22,20 +23,12 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x333333);
 
 // create sky and road environment
-createEnvironment(scene, renderer as any);
+createEnvironment(scene);
 
-// adds some reflections
-// adds some reflections (PMREM-prefiltered for smooth, high-quality reflections)
-const pmremGenerator = new THREE.PMREMGenerator(renderer as any);
-pmremGenerator.compileEquirectangularShader();
-const hdrEquirect = await new HDRLoader().loadAsync('textures/rural_evening_road_2k.hdr');
-const env = pmremGenerator.fromEquirectangular(hdrEquirect).texture;
-scene.environment = env;
-// Use the prefiltered HDR cubemap as the scene background (sky)
-scene.background = env;
-// cleanup raw texture and generator
-if ((hdrEquirect as any).dispose) (hdrEquirect as any).dispose();
-pmremGenerator.dispose();
+const texture = await loadTexture('rural_evening_road_2k.hdr');
+scene.environment = texture; // set as scene environment for reflections
+scene.background = texture; // Use the prefiltered HDR cubemap as the scene background (sky)
+
 // and some lights
 scene.add(createAmbiantLight());
 scene.add(createDirectionalLight());
