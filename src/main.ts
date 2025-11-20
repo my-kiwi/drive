@@ -1,29 +1,21 @@
 import * as THREE from 'three';
-import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js';
 
 import { createCar } from './3d-objects/car';
 import { createAmbiantLight, createDirectionalLight } from './lights';
 import { createCamera } from './camera';
 import { createRenderer } from './renderer';
 import { createControls } from './controls/controls';
-import { createEnvironment } from './environment';
+import { createRoad } from './3d-objects/road';
 import { createBuildings } from './3d-objects/buldings';
 import { loadTexture } from './utils/texture-loader';
 
 const renderer = createRenderer();
-
 document.body.appendChild(renderer.domElement);
 
 const cameraController = createCamera();
 const controls = createControls();
 
-// Set the car as the camera target (will be available after car is created)
-
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x333333);
-
-// create sky and road environment
-createEnvironment(scene);
 
 const texture = await loadTexture('red-sky-at-night-cirrostratus-skydome_2K.exr');
 scene.environment = texture; // set as scene environment for reflections
@@ -34,9 +26,12 @@ scene.add(createAmbiantLight());
 scene.add(createDirectionalLight());
 
 // adds fog in the distance
-scene.fog = new THREE.Fog(0x3a3a3a, 10, 50);
+scene.fog = new THREE.Fog(0x070202, 10, 50);
 
-// main subject: the car
+// add meshes
+const road = createRoad();
+scene.add(road);
+
 const car = await createCar();
 scene.add(car.model);
 

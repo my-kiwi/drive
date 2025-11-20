@@ -1,10 +1,8 @@
 import * as THREE from 'three';
-import { getRenderer } from './renderer';
+import { getRenderer } from '../renderer';
 
-export function createEnvironment(scene: THREE.Scene) {
+export function createRoad(): THREE.Mesh {
   const renderer = getRenderer();
-  // Match fog color to horizon glow for depth
-  scene.fog = new THREE.Fog(new THREE.Color(0x333333), 10, 200);
 
   // Create a procedural road texture using a canvas.
   const roadCanvas = document.createElement('canvas');
@@ -68,6 +66,5 @@ export function createEnvironment(scene: THREE.Scene) {
   road.position.y = 0;
   road.receiveShadow = true;
 
-  // A slight tilt/curve can be simulated by bending vertices if desired later
-  scene.add(road);
+  return road;
 }
