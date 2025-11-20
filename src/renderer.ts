@@ -18,4 +18,4 @@ export const getRenderer = (): THREE.WebGLRenderer => {
     createRenderer();
   }
   return renderer;
-}
+};
