@@ -6,5 +6,5 @@ export const loadModel = async (name: string) => {
   const dracoLoader = new DRACOLoader();
   dracoLoader.setDecoderPath('./libs/draco/gltf/');
   loader.setDRACOLoader(dracoLoader);
-  return loader.loadAsync(`./models/${name}.glb`);
+  return loader.loadAsync(`./models/${name}`);
 };
