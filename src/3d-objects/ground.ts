@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { loadTexture } from '../utils/texture-loader';
+import { Constants } from '../constants';
 
 export const createGround = async (): Promise<THREE.Mesh> => {
   const roadTexture = await loadTexture('crack-dirt.jpg');
@@ -9,8 +10,8 @@ export const createGround = async (): Promise<THREE.Mesh> => {
   roadTexture.repeat.set(50, 50);
   roadTexture.needsUpdate = true;
 
-  const roadWidth = 4000;
-  const roadLength = 4000;
+  const roadWidth = Constants.MAP_SIZE;
+  const roadLength = Constants.MAP_SIZE;
   const geometry = new THREE.PlaneGeometry(roadLength, roadWidth);
   const material = new THREE.MeshStandardMaterial({
     map: roadTexture,
