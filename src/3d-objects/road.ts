@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { loadTexture } from '../utils/texture-loader';
 
-export async function createRoad(): Promise<THREE.Mesh> {
+export const createRoad = async (): Promise<THREE.Mesh> => {
   const roadTexture = await loadTexture('road.jpg');
 
   roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
