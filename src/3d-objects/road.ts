@@ -2,50 +2,6 @@ import * as THREE from 'three';
 import { loadTexture } from '../utils/texture-loader';
 
 export async function createRoad(): Promise<THREE.Mesh> {
-
-  // Create a procedural road texture using a canvas.
-  const roadCanvas = document.createElement('canvas');
-  roadCanvas.width = 4000;
-  roadCanvas.height = 3000;
-  const ctx = roadCanvas.getContext('2d')!;
-
-  // Draw asphalt gradient
-  const g = ctx.createLinearGradient(0, 0, 0, roadCanvas.height);
-  g.addColorStop(0, '#3a3a3a');
-  g.addColorStop(1, '#222222');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, roadCanvas.width, roadCanvas.height);
-
-  // Add subtle noise (simple lines) to simulate texture
-  //   ctx.strokeStyle = 'rgba(0,0,0,0.03)';
-  //   for (let i = 0; i < 3000; i++) {
-  //     const x = Math.random() * roadCanvas.width;
-  //     ctx.beginPath();
-  //     ctx.moveTo(x, 0);
-  //     ctx.lineTo(x + (Math.random() - 0.5) * 10, roadCanvas.height);
-  //     ctx.stroke();
-  //   }
-
-  // Draw center dashed line
-  ctx.strokeStyle = 'rgba(255,255,200,0.9)';
-  ctx.lineWidth = 5;
-  const dashH = 4;
-  const gapH = 20;
-  let y = 0;
-  while (y < roadCanvas.height) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(0, Math.min(roadCanvas.height, y + dashH));
-    ctx.stroke();
-    y += dashH + gapH;
-  }
-
-  // Draw side edges (curb)
-  ctx.fillStyle = '#2b2b2b';
-  ctx.fillRect(0, 0, 80, roadCanvas.height);
-  ctx.fillRect(roadCanvas.width - 80, 0, 80, roadCanvas.height);
-
-  // Create texture
   const roadTexture = await loadTexture('road.jpg');
 
   //const roadTexture = new THREE.CanvasTexture(roadCanvas);
