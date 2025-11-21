@@ -25,7 +25,7 @@ scene.background = texture; // Use the prefiltered HDR cubemap as the scene back
 scene.add(createDirectionalLight());
 
 // adds fog in the distance
-scene.fog = new THREE.Fog(0x070202, 10, 50);
+scene.fog = new THREE.Fog(0x070202, 10, 150);
 
 // add meshes
 const ground = await createGround();
