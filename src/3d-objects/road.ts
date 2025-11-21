@@ -61,10 +61,11 @@ export async function createRoad(): Promise<THREE.Mesh> {
     metalness: 0.0,
   });
   const road = new THREE.Mesh(geometry, material);
+  
   road.rotation.x = -Math.PI / 2;
   road.rotation.z = -Math.PI / 2;
 
-  road.position.y = -0.05;
+  road.position.y = -0.05; // place below car for proper shadows
   road.position.x = 0; // align with car start position
   road.receiveShadow = true;
 
