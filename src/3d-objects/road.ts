@@ -64,7 +64,8 @@ export async function createRoad(): Promise<THREE.Mesh> {
   road.rotation.x = -Math.PI / 2;
   road.rotation.z = -Math.PI / 2;
 
-  road.position.y = 0;
+  road.position.y = -0.05;
+  road.position.x = 0; // align with car start position
   road.receiveShadow = true;
 
   return road;
