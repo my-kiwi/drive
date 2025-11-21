@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 import { createCar } from './3d-objects/car';
-import { createAmbiantLight, createDirectionalLight } from './lights';
+import { createDirectionalLight } from './lights';
 import { createCamera } from './camera';
 import { createRenderer } from './renderer';
 import { createControls } from './controls/controls';
@@ -22,7 +22,6 @@ scene.environment = texture; // set as scene environment for reflections
 scene.background = texture; // Use the prefiltered HDR cubemap as the scene background (sky)
 
 // and some lights
-scene.add(createAmbiantLight());
 scene.add(createDirectionalLight());
 
 // adds fog in the distance
