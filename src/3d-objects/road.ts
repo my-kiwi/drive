@@ -4,13 +4,13 @@ import { loadTexture } from '../utils/texture-loader';
 export async function createRoad(): Promise<THREE.Mesh> {
   const roadTexture = await loadTexture('road.jpg');
 
-  //const roadTexture = new THREE.CanvasTexture(roadCanvas);
   roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
   roadTexture.repeat.set(50, 1); // repeat far forward
   roadTexture.needsUpdate = true;
 
-  // Large plane for the ground (road)
-  const geometry = new THREE.PlaneGeometry(4000, 15, 1, 1);
+  const roadWidth = 13;
+  const roadLength = 4000;
+  const geometry = new THREE.PlaneGeometry(roadLength, roadWidth, 1, 1);
   const material = new THREE.MeshStandardMaterial({
     map: roadTexture,
     roughness: 1.0,
