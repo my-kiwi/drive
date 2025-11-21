@@ -3,29 +3,28 @@ import { loadTexture } from '../utils/texture-loader';
 import { Constants } from '../constants';
 
 export const createGround = async (): Promise<THREE.Mesh> => {
-  const roadTexture = await loadTexture('crack-dirt.jpg');
+  const groundTexture = await loadTexture('crack-dirt.jpg');
 
   // TODO rename
-  roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
-  roadTexture.repeat.set(50, 50);
-  roadTexture.needsUpdate = true;
+  groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+  groundTexture.repeat.set(50, 50);
+  groundTexture.needsUpdate = true;
 
-  const roadWidth = Constants.MAP_SIZE;
-  const roadLength = Constants.MAP_SIZE;
-  const geometry = new THREE.PlaneGeometry(roadLength, roadWidth);
+  const groundWidth = Constants.MAP_SIZE;
+  const groundLenght = Constants.MAP_SIZE;
+  const geometry = new THREE.PlaneGeometry(groundLenght, groundWidth);
   const material = new THREE.MeshStandardMaterial({
-    map: roadTexture,
+    map: groundTexture,
     roughness: 1.0,
     metalness: 0.0,
   });
-  const road = new THREE.Mesh(geometry, material);
+  const ground = new THREE.Mesh(geometry, material);
 
-  road.rotation.x = -Math.PI / 2;
-  // road.rotation.z = -Math.PI / 2; // align with car direction
+  ground.rotation.x = -Math.PI / 2;
 
-  road.position.y = -0.06; // place road below road
-  road.position.x = 0;
-  road.receiveShadow = true;
+  ground.position.y = -0.06; // place road below road
+  ground.position.x = 0;
+  ground.receiveShadow = true;
 
-  return road;
+  return ground;
 };
