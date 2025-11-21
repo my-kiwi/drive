@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { Controls } from '../controls/controls';
+import { Controls, DEFAULT_DX } from '../controls/controls';
 import { loadModel } from '../utils/model-loader';
 import { Constants } from '../constants';
 
@@ -108,8 +108,8 @@ function createVehiclePhysics(): VehiclePhysics {
     accelerationRate: 7, // Units per second squared
     brakeRate: 15, // Units per second squared
     frictionRate: 2, // Units per second squared
-    maxSteeringAngle: Math.PI / 8, // 45/2 degrees
-    steeringSpeed: 0.5, // Radians per second
+    maxSteeringAngle: Math.PI / 50,
+    steeringSpeed: 0.1, // Radians per second
     returnSpeed: 5.0, // Return to center speed
   };
 }
@@ -132,6 +132,7 @@ function updateVehiclePhysics(
       physics.acceleration = 0;
     }
   }
+  console.log(controls.dx);
 
   // Update velocity based on acceleration
   physics.velocity += physics.acceleration * deltaTime;
@@ -148,11 +149,12 @@ function updateVehiclePhysics(
   }
 
   // Handle steering
-  const targetSteering = controls.left
+  let targetSteering = controls.left
     ? physics.maxSteeringAngle
     : controls.right
       ? -physics.maxSteeringAngle
       : 0;
+  targetSteering *= Math.abs(controls.dx) / DEFAULT_DX; // Scale steering by joystick X position
 
   // Smoothly interpolate steering
   if (targetSteering !== physics.steering) {

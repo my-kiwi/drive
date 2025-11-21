@@ -2,7 +2,10 @@ import { isMobileDevice } from '../utils/device';
 import { createControlsUI } from './controls-ui';
 import { createJoystickUI } from './joystick';
 
+export const DEFAULT_DX = 25;
+
 export interface Controls {
+  dx: number;
   left: boolean;
   right: boolean;
   up: boolean;
@@ -15,6 +18,7 @@ export const controls: Controls = {
   right: false,
   up: false,
   down: false,
+  dx: DEFAULT_DX,
   update: () => {
     // Placeholder for dynamic update function
   },

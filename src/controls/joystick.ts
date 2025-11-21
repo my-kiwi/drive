@@ -41,8 +41,9 @@ export function createJoystickUI() {
     controls.down = dy > 10;
 
     // Left/right is based on X position
-    controls.left = dx < -10;
-    controls.right = dx > 10;
+    controls.left = dx < 0;
+    controls.right = dx > 0;
+    controls.dx = dx;
   }
 
   function onTouchStart(e: TouchEvent) {
