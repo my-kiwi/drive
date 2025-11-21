@@ -95,7 +95,7 @@ function createVehiclePhysics(): VehiclePhysics {
   return {
     velocity: 0,
     acceleration: 0,
-    orientation: 0,
+    orientation: Math.PI, // Facing sun initially
     steering: 0,
     maxVelocity: 100, // Units per second
     accelerationRate: 7, // Units per second squared
@@ -222,5 +222,6 @@ const createCarModel = async (): Promise<CarModel> => {
   // scale and position
   carModel.scale.set(1, 1, 1);
   carModel.position.set(0, 0, 0);
+
   return carModel;
 };
