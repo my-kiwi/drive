@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { loadTexture } from '../utils/texture-loader';
 
-export const createGround= async (): Promise<THREE.Mesh> => {
+export const createGround = async (): Promise<THREE.Mesh> => {
   const roadTexture = await loadTexture('crack-dirt.jpg');
 
   // TODO rename
@@ -22,7 +22,7 @@ export const createGround= async (): Promise<THREE.Mesh> => {
   road.rotation.x = -Math.PI / 2;
   // road.rotation.z = -Math.PI / 2; // align with car direction
 
-  road.position.y = -0.06; // place road below road 
+  road.position.y = -0.06; // place road below road
   road.position.x = 0;
   road.receiveShadow = true;
 
