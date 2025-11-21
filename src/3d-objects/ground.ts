@@ -5,7 +5,6 @@ import { Constants } from '../constants';
 export const createGround = async (): Promise<THREE.Mesh> => {
   const groundTexture = await loadTexture('crack-dirt.jpg');
 
-  // TODO rename
   groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
   groundTexture.repeat.set(50, 50);
   groundTexture.needsUpdate = true;
