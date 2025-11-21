@@ -29,14 +29,14 @@ scene.add(createDirectionalLight());
 scene.fog = new THREE.Fog(0x070202, 10, 50);
 
 // add meshes
-const road = createRoad();
+const road = await createRoad();
 scene.add(road);
 
 const car = await createCar();
 scene.add(car.model);
 
 const buildings = await createBuildings();
-scene.add(buildings);
+//scene.add(buildings);
 
 // Set car as camera target
 cameraController.setTarget(car.model);

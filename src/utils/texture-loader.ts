@@ -9,19 +9,26 @@ const getLoader = (filerName: string) => {
   if (filerName.endsWith('.exr')) {
     return new EXRLoader();
   }
-  return new HDRLoader();
+  if( filerName.endsWith('.hdr')) {
+    return new HDRLoader();
+  }
+  return new THREE.TextureLoader();
 };
 
 export const loadTexture = async (fileName: string): Promise<THREE.Texture> => {
-  const renderer = getRenderer();
-  const pmremGenerator = new THREE.PMREMGenerator(renderer);
-  pmremGenerator.compileEquirectangularShader();
+  const loader = getLoader(fileName);
+  const baseTexture = await loader.loadAsync(`textures/${fileName}`);
 
-  const hdrEquirect = await getLoader(fileName).loadAsync(`textures/${fileName}`);
-  const texture = pmremGenerator.fromEquirectangular(hdrEquirect).texture;
+  if (loader instanceof THREE.TextureLoader) {
+    return baseTexture;
+  }
+  
+  const pmremGenerator = new THREE.PMREMGenerator(getRenderer());
+  pmremGenerator.compileEquirectangularShader();
+  const texture = pmremGenerator.fromEquirectangular(baseTexture).texture;
 
   // cleanup raw texture and generator
-  hdrEquirect.dispose?.();
+  baseTexture.dispose?.();
   pmremGenerator.dispose();
   return texture;
 };

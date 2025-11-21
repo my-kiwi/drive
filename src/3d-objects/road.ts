@@ -1,13 +1,15 @@
 import * as THREE from 'three';
 import { getRenderer } from '../renderer';
+import { loadModel } from '../utils/model-loader';
+import { loadTexture } from '../utils/texture-loader';
 
-export function createRoad(): THREE.Mesh {
+export async function createRoad(): Promise<THREE.Mesh> {
   const renderer = getRenderer();
 
   // Create a procedural road texture using a canvas.
   const roadCanvas = document.createElement('canvas');
   roadCanvas.width = 4000;
-  roadCanvas.height = 300;
+  roadCanvas.height = 3000;
   const ctx = roadCanvas.getContext('2d')!;
 
   // Draw asphalt gradient
@@ -47,15 +49,15 @@ export function createRoad(): THREE.Mesh {
   ctx.fillRect(roadCanvas.width - 80, 0, 80, roadCanvas.height);
 
   // Create texture
-  const roadTexture = new THREE.CanvasTexture(roadCanvas);
+  const roadTexture = await loadTexture('road.jpg');
+
+  //const roadTexture = new THREE.CanvasTexture(roadCanvas);
   roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
   roadTexture.repeat.set(50, 1); // repeat far forward
-  (roadTexture as any).anisotropy = renderer.capabilities.getMaxAnisotropy();
-  (roadTexture as any).encoding = (THREE as any).sRGBEncoding || (THREE as any).LinearEncoding;
   roadTexture.needsUpdate = true;
 
   // Large plane for the ground (road)
-  const geometry = new THREE.PlaneGeometry(4000, 300, 1, 1);
+  const geometry = new THREE.PlaneGeometry(4000, 30, 1, 1);
   const material = new THREE.MeshStandardMaterial({
     map: roadTexture,
     roughness: 1.0,
