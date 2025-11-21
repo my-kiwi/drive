@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import { Controls } from '../controls/controls';
 import { loadModel } from '../utils/model-loader';
+import { Constants } from '../constants';
 
 type CarModelObjetKey =
   | 'body'
@@ -69,6 +70,12 @@ export const createCar = async () => {
 
     // Move car based on velocity and orientation
     model.position.add(forward.multiplyScalar(physics.velocity * deltaTime));
+
+    if (model.position.x > Constants.MAP_SIZE / 3) model.position.x = 0;
+    if (model.position.x < -Constants.MAP_SIZE / 3) model.position.x = 0;
+    if (model.position.z > Constants.MAP_SIZE / 3) model.position.z = 0;
+    if (model.position.z < -Constants.MAP_SIZE / 3) model.position.z = 0;
+
     model.rotation.y = physics.orientation;
   };
   return {
