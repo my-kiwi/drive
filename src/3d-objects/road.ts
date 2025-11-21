@@ -1,10 +1,7 @@
 import * as THREE from 'three';
-import { getRenderer } from '../renderer';
-import { loadModel } from '../utils/model-loader';
 import { loadTexture } from '../utils/texture-loader';
 
 export async function createRoad(): Promise<THREE.Mesh> {
-  const renderer = getRenderer();
 
   // Create a procedural road texture using a canvas.
   const roadCanvas = document.createElement('canvas');
@@ -65,6 +62,8 @@ export async function createRoad(): Promise<THREE.Mesh> {
   });
   const road = new THREE.Mesh(geometry, material);
   road.rotation.x = -Math.PI / 2;
+  road.rotation.z = -Math.PI / 2;
+
   road.position.y = 0;
   road.receiveShadow = true;
 
