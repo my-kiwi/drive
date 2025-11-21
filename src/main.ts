@@ -7,6 +7,7 @@ import { createRenderer } from './renderer';
 import { createControls } from './controls/controls';
 import { createRoad } from './3d-objects/road';
 import { loadTexture } from './utils/texture-loader';
+import { createGround } from './3d-objects/ground';
 
 const renderer = createRenderer();
 document.body.appendChild(renderer.domElement);
@@ -27,6 +28,9 @@ scene.add(createDirectionalLight());
 scene.fog = new THREE.Fog(0x070202, 10, 50);
 
 // add meshes
+const ground = await createGround();
+scene.add(ground);
+
 const road = await createRoad();
 scene.add(road);
 
