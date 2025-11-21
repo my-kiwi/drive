@@ -17,7 +17,7 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
     metalness: 0.0,
   });
   const road = new THREE.Mesh(geometry, material);
-  
+
   road.rotation.x = -Math.PI / 2;
   road.rotation.z = -Math.PI / 2; // align with car direction
 
@@ -26,4 +26,4 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   road.receiveShadow = true;
 
   return road;
-}
+};

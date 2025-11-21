@@ -6,7 +6,6 @@ import { createCamera } from './camera';
 import { createRenderer } from './renderer';
 import { createControls } from './controls/controls';
 import { createRoad } from './3d-objects/road';
-import { createBuildings } from './3d-objects/buldings';
 import { loadTexture } from './utils/texture-loader';
 
 const renderer = createRenderer();
@@ -34,7 +33,7 @@ scene.add(road);
 const car = await createCar();
 scene.add(car.model);
 
-const buildings = await createBuildings();
+// const buildings = await createBuildings();
 //scene.add(buildings);
 
 // Set car as camera target

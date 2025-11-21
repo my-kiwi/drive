@@ -9,7 +9,7 @@ const getLoader = (filerName: string) => {
   if (filerName.endsWith('.exr')) {
     return new EXRLoader();
   }
-  if( filerName.endsWith('.hdr')) {
+  if (filerName.endsWith('.hdr')) {
     return new HDRLoader();
   }
   return new THREE.TextureLoader();
@@ -22,7 +22,7 @@ export const loadTexture = async (fileName: string): Promise<THREE.Texture> => {
   if (loader instanceof THREE.TextureLoader) {
     return baseTexture;
   }
-  
+
   const pmremGenerator = new THREE.PMREMGenerator(getRenderer());
   pmremGenerator.compileEquirectangularShader();
   const texture = pmremGenerator.fromEquirectangular(baseTexture).texture;
