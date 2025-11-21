@@ -21,7 +21,7 @@ export const createGround = async (): Promise<THREE.Mesh> => {
 
   ground.rotation.x = -Math.PI / 2;
 
-  ground.position.y = -0.06; // place road below road
+  ground.position.y = -0.1; // place road below road
   ground.position.x = 0;
   ground.receiveShadow = true;
 
