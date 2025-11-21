@@ -97,12 +97,12 @@ function createVehiclePhysics(): VehiclePhysics {
     acceleration: 0,
     orientation: 0,
     steering: 0,
-    maxVelocity: 15, // Units per second
+    maxVelocity: 100, // Units per second
     accelerationRate: 7, // Units per second squared
     brakeRate: 15, // Units per second squared
     frictionRate: 2, // Units per second squared
-    maxSteeringAngle: Math.PI / 4, // 45 degrees
-    steeringSpeed: 2.5, // Radians per second
+    maxSteeringAngle: Math.PI / 8, // 45/2 degrees
+    steeringSpeed: 0.5, // Radians per second
     returnSpeed: 5.0, // Return to center speed
   };
 }
