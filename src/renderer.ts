@@ -5,7 +5,7 @@ let renderer: THREE.WebGLRenderer;
 
 export const createRenderer = () => {
   renderer = new THREE.WebGLRenderer({
-    antialias: true,
+    antialias: false,
   });
 
   renderer.setSize(window.innerWidth, window.innerHeight);
