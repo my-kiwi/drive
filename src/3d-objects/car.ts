@@ -132,7 +132,6 @@ function updateVehiclePhysics(
       physics.acceleration = 0;
     }
   }
-  console.log(controls.dx);
 
   // Update velocity based on acceleration
   physics.velocity += physics.acceleration * deltaTime;
