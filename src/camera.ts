@@ -23,7 +23,7 @@ export function createCamera(): CameraController {
     distance: 4, // Negative distance to position behind car
     height: 3, // Height above car
     lookAhead: -2, // Negative value to look ahead of car from behind
-    smoothing: 0.3, // Lower = smoother camera (0-1)
+    smoothing: 0.1, // Lower = smoother camera (0-1)
     rotationSmoothing: 0.25, // Rotation smoothing factor
   };
 
