@@ -151,10 +151,10 @@ function createVehiclePhysics(): VehiclePhysics {
     acceleration: 0,
     orientation: Math.PI, // Facing sun initially
     steering: 0,
-    maxVelocity: 100, // Units per second
+    maxVelocity: 80, // Units per second
     accelerationRate: 7, // Units per second squared
-    brakeRate: 15, // Units per second squared
-    frictionRate: 2, // Units per second squared
+    brakeRate: 25, // Units per second squared
+    frictionRate: 10, // Units per second squared
     maxSteeringAngle: Math.PI / 50,
     steeringSpeed: 0.1, // Radians per second
     returnSpeed: 5.0, // Return to center speed
@@ -168,9 +168,9 @@ function updateVehiclePhysics(
 ): void {
   // Handle acceleration based on controls
   if (controls.up) {
-    physics.acceleration = physics.accelerationRate;
+    physics.acceleration = physics.velocity >= 0 ? physics.accelerationRate : physics.brakeRate;
   } else if (controls.down) {
-    physics.acceleration = -physics.brakeRate;
+    physics.acceleration = physics.velocity < 0 ? -physics.accelerationRate : -physics.brakeRate;
   } else {
     // Apply friction when no input
     if (Math.abs(physics.velocity) > 0) {
