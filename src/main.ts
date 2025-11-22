@@ -8,6 +8,7 @@ import { createControls } from './controls/controls';
 import { createRoad } from './3d-objects/road';
 import { loadTexture } from './utils/texture-loader';
 import { createGround } from './3d-objects/ground';
+import { Constants } from './constants';
 
 const renderer = createRenderer();
 document.body.appendChild(renderer.domElement);
@@ -22,7 +23,7 @@ scene.environment = texture; // set as scene environment for reflections
 scene.background = texture; // Use the prefiltered HDR cubemap as the scene background (sky)
 
 // and some lights
-scene.add(createDirectionalLight());
+// scene.add(createDirectionalLight());
 
 // adds fog in the distance
 scene.fog = new THREE.Fog(0x070202, 10, 150);
@@ -35,6 +36,7 @@ const road = await createRoad();
 scene.add(road);
 
 const car = await createCar();
+car.switchHeadlights(false);
 scene.add(car.model);
 
 // const buildings = await createBuildings();
@@ -51,12 +53,21 @@ window.addEventListener('keydown', (e) => {
 });
 
 let lastTime = performance.now();
+const startTime = lastTime;
+let elapsedSeconds = 0;
 
 // Animation loop
 const animate = () => {
   const currentTime = performance.now();
   const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
   lastTime = currentTime;
+  elapsedSeconds = (currentTime - startTime) / 1000;
+  
+  // update scene darkess based time elapsed
+  renderer.toneMappingExposure = Math.max(Constants.RENDERER_EXPOSURE.LOW, Constants.RENDERER_EXPOSURE.HIGH - (elapsedSeconds / 30));
+  if (renderer.toneMappingExposure <= Constants.RENDERER_EXPOSURE.LOW) {
+    car.switchHeadlights(true);
+  }
 
   controls.update();
   car.update(deltaTime, controls);

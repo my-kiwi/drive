@@ -23,8 +23,35 @@ type CarModel = Omit<THREE.Object3D<THREE.Object3DEventMap>, 'getObjectByName'> 
   getObjectByName(key: CarModelObjetKey): THREE.Mesh;
 };
 
+const addHeadlights = (carModel: CarModel): THREE.SpotLight[] => {
+  // feux de route qui illuminent la route
+  const createSpotlight = () => {
+    const spotlight  = new THREE.SpotLight(0xffeeaa, 5000, 1000, Math.PI / 8, 0.5, 2);
+    spotlight.position.y = 1.2;
+    spotlight.position.z = -1.2;
+
+    spotlight.target.position.y = 0.1;
+    spotlight.target.position.z = -60;
+
+    // spotlight.rotation.z = -Math.PI / 2;
+    return spotlight;
+  }
+
+  const headlightLeft = createSpotlight();
+  headlightLeft.position.x = headlightLeft.target.position.x = 0.8;
+
+  const headlightRight = createSpotlight();
+  headlightRight.position.x = headlightRight.target.position.x = -headlightLeft.position.x;
+
+  carModel.add(headlightRight, headlightLeft, headlightRight.target, headlightLeft.target);
+
+  return [headlightLeft, headlightRight];
+}
+
+
 export const createCar = async () => {
   const model = await createCarModel();
+  const headlights = addHeadlights(model);
   const physics = createVehiclePhysics();
   const update = (deltaTime: number, controls: Controls) => {
     // Update physics
@@ -78,9 +105,16 @@ export const createCar = async () => {
 
     model.rotation.y = physics.orientation;
   };
+  const switchHeadlights = (on: boolean) => {
+    headlights.forEach((light) => {
+      light.intensity = on ? 5000 : 0;
+    });
+  };
+
   return {
     model,
     update,
+    switchHeadlights,
   };
 };
 

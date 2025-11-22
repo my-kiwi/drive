@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Constants } from './constants';
 
 let renderer: THREE.WebGLRenderer;
 
@@ -9,7 +10,9 @@ export const createRenderer = () => {
 
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.85;
+  renderer.toneMappingExposure = Constants.RENDERER_EXPOSURE.HIGH;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   return renderer;
 };
 
