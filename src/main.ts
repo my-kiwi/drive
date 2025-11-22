@@ -67,7 +67,7 @@ const animate = () => {
     Constants.RENDERER_EXPOSURE.LOW,
     Constants.RENDERER_EXPOSURE.HIGH - elapsedSeconds / 30
   );
-  if (renderer.toneMappingExposure <= Constants.RENDERER_EXPOSURE.LOW) {
+  if (renderer.toneMappingExposure <= (Constants.RENDERER_EXPOSURE.LOW * 2)) {
     car.switchHeadlights(true);
   }
 
