@@ -23,10 +23,10 @@ type CarModel = Omit<THREE.Object3D<THREE.Object3DEventMap>, 'getObjectByName'> 
   getObjectByName(key: CarModelObjetKey): THREE.Mesh;
 };
 
-const addHeadlights = (carModel: CarModel): THREE.SpotLight[] => {
+const addHeadlights = (carModel: CarModel) => {
   // feux de route qui illuminent la route
   const createSpotlight = () => {
-    const spotlight  = new THREE.SpotLight(0xffeeaa, 5000, 1000, Math.PI / 8, 0.5, 2);
+    const spotlight = new THREE.SpotLight(0xffeeaa, 5000, 1000, Math.PI / 8, 0.5, 2);
     spotlight.position.y = 1.2;
     spotlight.position.z = -1.2;
 
@@ -35,7 +35,7 @@ const addHeadlights = (carModel: CarModel): THREE.SpotLight[] => {
 
     // spotlight.rotation.z = -Math.PI / 2;
     return spotlight;
-  }
+  };
 
   const headlightLeft = createSpotlight();
   headlightLeft.position.x = headlightLeft.target.position.x = 0.8;
@@ -45,9 +45,22 @@ const addHeadlights = (carModel: CarModel): THREE.SpotLight[] => {
 
   carModel.add(headlightRight, headlightLeft, headlightRight.target, headlightLeft.target);
 
-  return [headlightLeft, headlightRight];
-}
+  // add backlights (simple red lights at the back, no illumination)
+  const createBacklight = () => {
+    const backlight = new THREE.RectAreaLight(0xff0000, 500, 0.1, 0.1);
+    backlight.position.y = 0.5;
+    backlight.position.z = 2.0;
+    backlight.rotation.y = Math.PI; // face backwards
+    return backlight;
+  };
+  const backlightLeft = createBacklight();
+  const backlightRight = createBacklight();
+  backlightLeft.position.x = -0.6;
+  backlightRight.position.x = 0.6;
+  carModel.add(backlightLeft, backlightRight);
 
+  return [headlightLeft, headlightRight, backlightLeft, backlightRight];
+};
 
 export const createCar = async () => {
   const model = await createCarModel();

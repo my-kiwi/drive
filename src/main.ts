@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 
 import { createCar } from './3d-objects/car';
-import { createDirectionalLight } from './lights';
 import { createCamera } from './camera';
 import { createRenderer } from './renderer';
 import { createControls } from './controls/controls';
@@ -36,7 +35,7 @@ const road = await createRoad();
 scene.add(road);
 
 const car = await createCar();
-car.switchHeadlights(false);
+// car.switchHeadlights(false);
 scene.add(car.model);
 
 // const buildings = await createBuildings();
@@ -62,9 +61,12 @@ const animate = () => {
   const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
   lastTime = currentTime;
   elapsedSeconds = (currentTime - startTime) / 1000;
-  
+
   // update scene darkess based time elapsed
-  renderer.toneMappingExposure = Math.max(Constants.RENDERER_EXPOSURE.LOW, Constants.RENDERER_EXPOSURE.HIGH - (elapsedSeconds / 30));
+  renderer.toneMappingExposure = Math.max(
+    Constants.RENDERER_EXPOSURE.LOW,
+    Constants.RENDERER_EXPOSURE.HIGH - elapsedSeconds / 30
+  );
   if (renderer.toneMappingExposure <= Constants.RENDERER_EXPOSURE.LOW) {
     car.switchHeadlights(true);
   }
