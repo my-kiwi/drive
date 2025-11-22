@@ -35,7 +35,7 @@ const road = await createRoad();
 scene.add(road);
 
 const car = await createCar();
-// car.switchHeadlights(false);
+car.switchHeadlights(false);
 scene.add(car.model);
 
 // const buildings = await createBuildings();
