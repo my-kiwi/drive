@@ -24,13 +24,13 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
     new THREE.Vector3(0, 0, 0),
     new THREE.Vector3(roadSegmentLength, 0, 10),
     new THREE.Vector3(roadSegmentLength * 2, 0, -10),
-    new THREE.Vector3(roadSegmentLength * 3, 0, 15),
+    new THREE.Vector3(roadSegmentLength * 3, 0, 150),
     new THREE.Vector3(roadSegmentLength * 4, 0, -15),
     new THREE.Vector3(roadSegmentLength * 5, 0, 0),
-    new THREE.Vector3(roadSegmentLength * 6, 0, 10),
-    new THREE.Vector3(roadSegmentLength * 7, 0, -10),
+    new THREE.Vector3(roadSegmentLength * 6, 0, 100),
+    new THREE.Vector3(roadSegmentLength * 7, 0, -100),
     new THREE.Vector3(roadSegmentLength * 8, 0, 0),
-    new THREE.Vector3(roadSegmentLength * 9, 0, 15),
+    new THREE.Vector3(roadSegmentLength * 9, 0, 150),
     new THREE.Vector3(roadSegmentLength * 10, 0, 0),
   ];
 
