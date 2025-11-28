@@ -68,7 +68,7 @@ const animate = () => {
     // update scene darkess based time elapsed
     renderer.toneMappingExposure = Math.max(
       Constants.RENDERER_EXPOSURE.LOW,
-      Constants.RENDERER_EXPOSURE.HIGH - elapsedSeconds / 30
+      Constants.RENDERER_EXPOSURE.HIGH - elapsedSeconds / 60
     );
     if (renderer.toneMappingExposure <= Constants.RENDERER_EXPOSURE.LOW * 2) {
       car.switchHeadlights(true);
