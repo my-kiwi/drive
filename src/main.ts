@@ -9,6 +9,8 @@ import { loadTexture } from './utils/texture-loader';
 import { createGround } from './3d-objects/ground';
 import { Constants } from './constants';
 
+const isSwitchToNightEnabled = true;
+
 const renderer = createRenderer();
 document.body.appendChild(renderer.domElement);
 
@@ -62,13 +64,15 @@ const animate = () => {
   lastTime = currentTime;
   elapsedSeconds = (currentTime - startTime) / 1000;
 
-  // update scene darkess based time elapsed
-  renderer.toneMappingExposure = Math.max(
-    Constants.RENDERER_EXPOSURE.LOW,
-    Constants.RENDERER_EXPOSURE.HIGH - elapsedSeconds / 30
-  );
-  if (renderer.toneMappingExposure <= Constants.RENDERER_EXPOSURE.LOW * 2) {
-    car.switchHeadlights(true);
+  if (isSwitchToNightEnabled) {
+    // update scene darkess based time elapsed
+    renderer.toneMappingExposure = Math.max(
+      Constants.RENDERER_EXPOSURE.LOW,
+      Constants.RENDERER_EXPOSURE.HIGH - elapsedSeconds / 30
+    );
+    if (renderer.toneMappingExposure <= Constants.RENDERER_EXPOSURE.LOW * 2) {
+      car.switchHeadlights(true);
+    }
   }
 
   controls.update();
