@@ -3,6 +3,7 @@ import { loadTexture } from '../utils/texture-loader';
 import { Constants } from '../constants';
 import { getRenderer } from '../renderer';
 
+
 export const createRoad = async (): Promise<THREE.Mesh> => {
   const roadTexture = await loadTexture('road.jpg');
 
@@ -47,12 +48,56 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   shape.lineTo(-roadThickness / 2, roadWidth / 2);
   shape.closePath();
 
+  const extrudeSettings: THREE.ExtrudeGeometryOptions = createExtrudeSettings(
+    curve,
+    roadSegments,
+    roadWidth,
+    textureScaleU,
+  );
+
+  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+  // The UVGenerator encodes U in world units / textureScaleU, so keep
+  // the texture repeat at 1 and let the UVs control tiling.
+  roadTexture.repeat.set(1, 1);
+  roadTexture.needsUpdate = true;
+
+  // set anisotropy for crisper texture at oblique angles
+  const maxAniso = getRenderer().capabilities.getMaxAnisotropy();
+  roadTexture.anisotropy = maxAniso;
+
+  // 🔥 Rotate geometry so the road lies flat (X-Z plane)
+  // geometry.rotateX(Math.PI / 2);
+
+  const material = new THREE.MeshStandardMaterial({
+    map: roadTexture,
+    roughness: 1.0,
+    metalness: 0.0,
+  });
+  const road = new THREE.Mesh(geometry, material);
+
+  // road.rotation.x = -Math.PI / 2;
+  road.rotation.y = -Math.PI / 2; // align with car direction
+
+  road.position.y = -0.05; // place road below car for proper shadows
+  // road.position.x = 0;
+  road.receiveShadow = true;
+
+  return road;
+};
+
+const createExtrudeSettings = (
+  curve: THREE.Curve<THREE.Vector3>,
+  segments: number,
+  roadWidth: number,
+  textureScaleU: number,
+): THREE.ExtrudeGeometryOptions => {
   // EXTRUDE
   // Pre-sample the curve so the UV generator can map each vertex to a
   // nearest point on the curve and produce stable U (distance) coordinates
   // and signed V (across-road) coordinates. This avoids small per-face
   // UVs and the brick-like tiling seen earlier.
-  const extrudeSteps = roadSegments * 8; // more steps = smoother road
+  const extrudeSteps = segments * 8; // more steps = smoother road
   const sampleDivisions = Math.max(100, extrudeSteps * 8);
   const samplePoints: THREE.Vector3[] = [];
   const sampleTangents: THREE.Vector3[] = [];
@@ -116,34 +161,5 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
       },
     },
   };
-
-  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-
-  // The UVGenerator encodes U in world units / textureScaleU, so keep
-  // the texture repeat at 1 and let the UVs control tiling.
-  roadTexture.repeat.set(1, 1);
-  roadTexture.needsUpdate = true;
-
-  // set anisotropy for crisper texture at oblique angles
-  const maxAniso = getRenderer().capabilities.getMaxAnisotropy();
-  roadTexture.anisotropy = maxAniso;
-
-  // 🔥 Rotate geometry so the road lies flat (X-Z plane)
-  // geometry.rotateX(Math.PI / 2);
-
-  const material = new THREE.MeshStandardMaterial({
-    map: roadTexture,
-    roughness: 1.0,
-    metalness: 0.0,
-  });
-  const road = new THREE.Mesh(geometry, material);
-
-  // road.rotation.x = -Math.PI / 2;
-  road.rotation.y = -Math.PI / 2; // align with car direction
-
-  road.position.y = -0.05; // place road below car for proper shadows
-  // road.position.x = 0;
-  road.receiveShadow = true;
-
-  return road;
+  return extrudeSettings;
 };
