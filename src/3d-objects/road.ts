@@ -16,7 +16,7 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
 
   const roadWidth = 13;
   const roadLength = Constants.MAP_SIZE;
-  const roadSegments = 100;
+  const roadSegments = 10;
   const roadSegmentLength = roadLength / roadSegments;
 
   // 1. Road curve
@@ -97,7 +97,7 @@ const createExtrudeSettings = (
   // nearest point on the curve and produce stable U (distance) coordinates
   // and signed V (across-road) coordinates. This avoids small per-face
   // UVs and the brick-like tiling seen earlier.
-  const extrudeSteps = segments * 8; // more steps = smoother road
+  const extrudeSteps = segments * 50; // more steps = smoother road
   const sampleDivisions = Math.max(100, extrudeSteps * 8);
   const samplePoints: THREE.Vector3[] = [];
   const sampleTangents: THREE.Vector3[] = [];
