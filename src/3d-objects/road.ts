@@ -3,7 +3,6 @@ import { loadTexture } from '../utils/texture-loader';
 import { Constants } from '../constants';
 import { getRenderer } from '../renderer';
 
-
 export const createRoad = async (): Promise<THREE.Mesh> => {
   const roadTexture = await loadTexture('road.jpg');
 
@@ -15,24 +14,20 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   roadTexture.needsUpdate = true;
 
   const roadWidth = 13;
-  const roadLength = Constants.MAP_SIZE;
+  const roadLength = Constants.MAP_SIZE / 10;
   const roadSegments = 10;
   const roadSegmentLength = roadLength / roadSegments;
 
   // 1. Road curve
-  const points = [
-    new THREE.Vector3(0, 0, 0),
-    new THREE.Vector3(roadSegmentLength, 0, 10),
-    new THREE.Vector3(roadSegmentLength * 2, 0, -10),
-    new THREE.Vector3(roadSegmentLength * 3, 0, 150),
-    new THREE.Vector3(roadSegmentLength * 4, 0, -15),
-    new THREE.Vector3(roadSegmentLength * 5, 0, 0),
-    new THREE.Vector3(roadSegmentLength * 6, 0, 100),
-    new THREE.Vector3(roadSegmentLength * 7, 0, -100),
-    new THREE.Vector3(roadSegmentLength * 8, 0, 0),
-    new THREE.Vector3(roadSegmentLength * 9, 0, 150),
-    new THREE.Vector3(roadSegmentLength * 10, 0, 0),
-  ];
+  const zTurns = [0, -10, 10, 150, -15, 0, 100, -100, 0, 150, 0];
+
+  const points: THREE.Vector3[] = [];
+  for (let i = -roadSegments; i <= roadSegments; i++) {
+    const x = i * roadSegmentLength;
+    const y = 0; // height
+    const z = zTurns[Math.abs(i)] || 0;
+    points.push(new THREE.Vector3(x, y, z));
+  }
 
   const curve = new THREE.CatmullRomCurve3(points);
   const roadThickness = 0.01;
@@ -52,7 +47,7 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
     curve,
     roadSegments,
     roadWidth,
-    textureScaleU,
+    textureScaleU
   );
 
   const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
@@ -90,7 +85,7 @@ const createExtrudeSettings = (
   curve: THREE.Curve<THREE.Vector3>,
   segments: number,
   roadWidth: number,
-  textureScaleU: number,
+  textureScaleU: number
 ): THREE.ExtrudeGeometryOptions => {
   // EXTRUDE
   // Pre-sample the curve so the UV generator can map each vertex to a

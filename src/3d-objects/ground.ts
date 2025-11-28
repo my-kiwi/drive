@@ -5,12 +5,13 @@ import { Constants } from '../constants';
 export const createGround = async (): Promise<THREE.Mesh> => {
   const groundTexture = await loadTexture('crack-dirt.jpg');
 
-  groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
-  groundTexture.repeat.set(50, 50);
-  groundTexture.needsUpdate = true;
-
   const groundWidth = Constants.MAP_SIZE;
   const groundLenght = Constants.MAP_SIZE;
+
+  groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+  groundTexture.repeat.set(groundWidth / 100, groundLenght / 100);
+  groundTexture.needsUpdate = true;
+
   const geometry = new THREE.PlaneGeometry(groundLenght, groundWidth);
   const material = new THREE.MeshStandardMaterial({
     map: groundTexture,
@@ -21,7 +22,7 @@ export const createGround = async (): Promise<THREE.Mesh> => {
 
   ground.rotation.x = -Math.PI / 2;
 
-  ground.position.y = -0.1; // place road below road
+  ground.position.y = -0.1; // place ground below road
   ground.position.x = 0;
   ground.receiveShadow = true;
 
