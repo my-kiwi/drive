@@ -125,12 +125,8 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   roadTexture.needsUpdate = true;
 
   // set anisotropy for crisper texture at oblique angles
-  try {
-    const maxAniso = getRenderer().capabilities.getMaxAnisotropy();
-    roadTexture.anisotropy = maxAniso;
-  } catch (e) {
-    // ignore if renderer isn't available yet
-  }
+  const maxAniso = getRenderer().capabilities.getMaxAnisotropy();
+  roadTexture.anisotropy = maxAniso;
 
   // 🔥 Rotate geometry so the road lies flat (X-Z plane)
   // geometry.rotateX(Math.PI / 2);
