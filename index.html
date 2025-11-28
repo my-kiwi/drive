@@ -8,5 +8,10 @@
   </head>
   <body>
     <script type="module" src="./src/main.ts"></script>
+    <script type="module">
+      if (window.location.hostname === 'localhost') {
+        document.title += ' (local)';
+      }
+    </script>
   </body>
 </html>
