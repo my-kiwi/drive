@@ -83,8 +83,6 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   return road;
 };
 
-let callsToUVGenerator = 0;
-
 const createExtrudeSettings = (
   curve: THREE.Curve<THREE.Vector3>,
   segments: number,

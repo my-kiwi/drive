@@ -269,7 +269,7 @@ const createCarModel = async (): Promise<CarModel> => {
 
   // scale and position
   carModel.scale.set(1, 1, 1);
-  carModel.position.set(0, 0.05/*slightly above road*/, 0);
+  carModel.position.set(0, 0.05 /*slightly above road*/, 0);
 
   return carModel;
 };
