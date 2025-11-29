@@ -14,14 +14,17 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   roadTexture.needsUpdate = true;
 
   const roadWidth = 13;
-  const roadLength = Constants.MAP_SIZE / 10;
-  const roadSegments = 10;
-  const roadSegmentLength = roadLength / roadSegments;
+  const roadLength = Constants.MAP_SIZE;
 
   // 1. Road curve
-  const zTurns = [0, -10, 10, 150, -15, 0, 100, -100, 0, 150, 0];
+  const zTurns = [0, -10, 10, 150, -150, 0, 100, -100, 0, 150, 0];
+  zTurns.push(...zTurns, ...zTurns, ...zTurns, ...zTurns, ...zTurns, ...zTurns); // repeat to extend road length
+
+  const roadSegments = zTurns.length;
+  const roadSegmentLength = roadLength / roadSegments;
 
   const points: THREE.Vector3[] = [];
+  // start from -halfLength to center the road at origin
   for (let i = -roadSegments; i <= roadSegments; i++) {
     const x = i * roadSegmentLength;
     const y = 0; // height
@@ -61,9 +64,6 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   const maxAniso = getRenderer().capabilities.getMaxAnisotropy();
   roadTexture.anisotropy = maxAniso;
 
-  // 🔥 Rotate geometry so the road lies flat (X-Z plane)
-  // geometry.rotateX(Math.PI / 2);
-
   const material = new THREE.MeshStandardMaterial({
     map: roadTexture,
     roughness: 1.0,
@@ -74,7 +74,7 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   // road.rotation.x = -Math.PI / 2;
   road.rotation.y = -Math.PI / 2; // align with car direction
 
-  road.position.y = -0.05; // place road below car for proper shadows
+  road.position.y = 0; // place road below car for proper shadows
   // road.position.x = 0;
   road.receiveShadow = true;
 
@@ -92,7 +92,7 @@ const createExtrudeSettings = (
   // nearest point on the curve and produce stable U (distance) coordinates
   // and signed V (across-road) coordinates. This avoids small per-face
   // UVs and the brick-like tiling seen earlier.
-  const extrudeSteps = segments * 50; // more steps = smoother road
+  const extrudeSteps = segments * 100; // more steps = smoother road
   const sampleDivisions = Math.max(100, extrudeSteps * 8);
   const samplePoints: THREE.Vector3[] = [];
   const sampleTangents: THREE.Vector3[] = [];
