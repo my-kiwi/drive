@@ -23,8 +23,6 @@ export function createCamera(): CameraController {
     distance: 4, // Negative distance to position behind car
     height: 3, // Height above car
     lookAhead: -2, // Negative value to look ahead of car from behind
-    smoothing: 0.1, // Lower = smoother camera (0-1)
-    rotationSmoothing: 0.25, // Rotation smoothing factor
   };
 
   // Orbit controls for free camera mode
@@ -61,7 +59,7 @@ export function createCamera(): CameraController {
 
     // Smoothly move camera
     currentLookAt.copy(idealLookAt);
-    currentTarget.lerp(idealPosition, settings.smoothing);
+    currentTarget.copy(idealPosition);
 
     // Update camera
     camera.position.copy(currentTarget);
