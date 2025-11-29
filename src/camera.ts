@@ -60,8 +60,8 @@ export function createCamera(): CameraController {
     const idealLookAt = targetPos.clone().add(lookAheadOffset);
 
     // Smoothly move camera
-    currentTarget.copy(idealPosition);
     currentLookAt.copy(idealLookAt);
+    currentTarget.lerp(idealPosition, settings.smoothing);
 
     // Update camera
     camera.position.copy(currentTarget);
