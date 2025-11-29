@@ -36,7 +36,9 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   const roadThickness = 0.01;
 
   // choose a base scale for how many world units equal one texture repeat
-  const textureScaleU = 10; // 1 tile every `textureScaleU` units along the road
+  // Increase this value to make each texture tile larger along the road
+  // (fewer repeats). Previously 10 produced small, closely spaced marks.
+  const textureScaleU = 100; // try 30 (bigger = more stretched along road)
 
   const shape = new THREE.Shape();
 
@@ -81,6 +83,8 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   return road;
 };
 
+let callsToUVGenerator = 0;
+
 const createExtrudeSettings = (
   curve: THREE.Curve<THREE.Vector3>,
   segments: number,
@@ -92,7 +96,7 @@ const createExtrudeSettings = (
   // nearest point on the curve and produce stable U (distance) coordinates
   // and signed V (across-road) coordinates. This avoids small per-face
   // UVs and the brick-like tiling seen earlier.
-  const extrudeSteps = segments * 100; // more steps = smoother road
+  const extrudeSteps = segments * 50; // more steps = smoother road
   const sampleDivisions = Math.max(100, extrudeSteps * 8);
   const samplePoints: THREE.Vector3[] = [];
   const sampleTangents: THREE.Vector3[] = [];
@@ -102,6 +106,9 @@ const createExtrudeSettings = (
     samplePoints.push(curve.getPointAt(u));
     sampleTangents.push(curve.getTangentAt(u).clone());
   }
+
+  // cache last found index to speed up nearest-sample queries
+  let lastBestIndex = 0;
 
   const extrudeSettings: THREE.ExtrudeGeometryOptions = {
     steps: extrudeSteps,
@@ -118,16 +125,32 @@ const createExtrudeSettings = (
           const vz = vertices[index * 3 + 2];
           const vPos = new THREE.Vector3(vx, vy, vz);
 
-          // find nearest sample on the curve
-          let bestI = 0;
-          let bestDist = Infinity;
-          for (let i = 0; i < samplePoints.length; i++) {
+          // find nearest sample on the curve using a local search
+          // starting from `lastBestIndex`. UV generation walks the
+          // geometry along the path so this is amortized cheap.
+          let bestI = lastBestIndex;
+          let bestDist = vPos.distanceToSquared(samplePoints[bestI]);
+          // forward
+          for (let i = bestI + 1; i < samplePoints.length; i++) {
             const d = vPos.distanceToSquared(samplePoints[i]);
             if (d < bestDist) {
               bestDist = d;
               bestI = i;
+            } else {
+              break;
             }
           }
+          // backward
+          for (let i = bestI - 1; i >= 0; i--) {
+            const d = vPos.distanceToSquared(samplePoints[i]);
+            if (d < bestDist) {
+              bestDist = d;
+              bestI = i;
+            } else {
+              break;
+            }
+          }
+          lastBestIndex = bestI;
 
           // U = distance along the curve (meters) scaled by textureScaleU
           const uMeters = sampleLengths[bestI];
