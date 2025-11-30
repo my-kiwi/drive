@@ -3,25 +3,15 @@ import { loadTexture } from '../utils/texture-loader';
 import { Constants } from '../constants';
 import { getRenderer } from '../renderer';
 
-export const roadState = {
-  path: [] as THREE.Vector2[],
+export const roadConfig = {
+  width: 13,
+  length: Constants.MAP_SIZE,
 };
 
-
-export const createRoad = async (): Promise<THREE.Mesh> => {
-  const roadTexture = await loadTexture('road.jpg');
-
-  // We'll set RepeatWrapping and a repeat value after we compute the
-  // road curve length so the texture tiles along the road instead of
-  // being stretched (ClampToEdge clamped large UVs causing the stretched look).
-  // Also set anisotropy from the renderer for better sampling.
-  roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
-  roadTexture.needsUpdate = true;
-
-  const roadWidth = 13;
+const getRoadPath = () => {
+  const roadPath: THREE.Vector2[] = [];
   const roadLength = Constants.MAP_SIZE;
 
-  // 1. Road curve
   const zTurns = [0, -10, 10, 150, -150, 0, 100, -100, 0, 150, 0];
   zTurns.push(...zTurns, ...zTurns, ...zTurns, ...zTurns, ...zTurns, ...zTurns); // repeat to extend road length
 
@@ -30,8 +20,20 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
 
   // start from -halfLength to center the road at origin
   for (let i = -roadSegments; i <= roadSegments; i++) {
-    roadState.path.push(new THREE.Vector2(i * roadSegmentLength, zTurns[Math.abs(i)] || 0));
+    roadPath.push(new THREE.Vector2(i * roadSegmentLength, zTurns[Math.abs(i)] || 0));
   }
+  return roadPath;
+}
+
+export const roadState = {
+  path: getRoadPath(),
+};
+
+export const createRoad = async (): Promise<THREE.Mesh> => {
+  const roadTexture = await loadTexture('road.jpg');
+
+  roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
+  roadTexture.needsUpdate = true;
 
   const curve = new THREE.CatmullRomCurve3(roadState.path.map((p) => new THREE.Vector3(
     p.x,
@@ -47,16 +49,14 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
 
   const shape = new THREE.Shape();
 
-  shape.moveTo(-roadThickness / 2, -roadWidth / 2);
-  shape.lineTo(roadThickness / 2, -roadWidth / 2);
-  shape.lineTo(roadThickness / 2, roadWidth / 2);
-  shape.lineTo(-roadThickness / 2, roadWidth / 2);
+  shape.moveTo(-roadThickness / 2, -roadConfig.width / 2);
+  shape.lineTo(roadThickness / 2, -roadConfig.width / 2);
+  shape.lineTo(roadThickness / 2, roadConfig.width / 2);
+  shape.lineTo(-roadThickness / 2, roadConfig.width / 2);
   shape.closePath();
 
   const extrudeSettings: THREE.ExtrudeGeometryOptions = createExtrudeSettings(
     curve,
-    roadSegments,
-    roadWidth,
     textureScaleU
   );
 
@@ -78,28 +78,21 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   });
   const road = new THREE.Mesh(geometry, material);
 
-  // road.rotation.x = -Math.PI / 2;
   road.rotation.y = -Math.PI / 2; // align with car direction
 
   road.position.y = 0; // place road below car for proper shadows
-  // road.position.x = 0;
   road.receiveShadow = true;
 
   return road;
 };
 
-const createExtrudeSettings = (
-  curve: THREE.Curve<THREE.Vector3>,
-  segments: number,
-  roadWidth: number,
-  textureScaleU: number
-): THREE.ExtrudeGeometryOptions => {
+const createExtrudeSettings = (curve: THREE.Curve<THREE.Vector3>, textureScaleU: number) => {
   // EXTRUDE
   // Pre-sample the curve so the UV generator can map each vertex to a
   // nearest point on the curve and produce stable U (distance) coordinates
   // and signed V (across-road) coordinates. This avoids small per-face
   // UVs and the brick-like tiling seen earlier.
-  const extrudeSteps = segments * 50; // more steps = smoother road
+  const extrudeSteps = roadState.path.length * 50; // more steps = smoother road
   const sampleDivisions = Math.max(100, extrudeSteps * 8);
   const samplePoints: THREE.Vector3[] = [];
   const sampleTangents: THREE.Vector3[] = [];
@@ -167,7 +160,7 @@ const createExtrudeSettings = (
           const signed = lateral.dot(binormal);
 
           // normalize v to 0..1 across road width
-          const halfWidth = roadWidth / 2;
+          const halfWidth = roadConfig.width / 2;
           const v = (signed / halfWidth + 1) / 2;
 
           return new THREE.Vector2(u, v);
