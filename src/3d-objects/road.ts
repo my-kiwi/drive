@@ -3,6 +3,11 @@ import { loadTexture } from '../utils/texture-loader';
 import { Constants } from '../constants';
 import { getRenderer } from '../renderer';
 
+export const roadState = {
+  path: [] as THREE.Vector2[],
+};
+
+
 export const createRoad = async (): Promise<THREE.Mesh> => {
   const roadTexture = await loadTexture('road.jpg');
 
@@ -23,22 +28,22 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   const roadSegments = zTurns.length;
   const roadSegmentLength = roadLength / roadSegments;
 
-  const points: THREE.Vector3[] = [];
   // start from -halfLength to center the road at origin
   for (let i = -roadSegments; i <= roadSegments; i++) {
-    const x = i * roadSegmentLength;
-    const y = 0; // height
-    const z = zTurns[Math.abs(i)] || 0;
-    points.push(new THREE.Vector3(x, y, z));
+    roadState.path.push(new THREE.Vector2(i * roadSegmentLength, zTurns[Math.abs(i)] || 0));
   }
 
-  const curve = new THREE.CatmullRomCurve3(points);
+  const curve = new THREE.CatmullRomCurve3(roadState.path.map((p) => new THREE.Vector3(
+    p.x,
+    0, // is actually the height (should be z) but the extrude geometry is rotated later
+    p.y))
+  );
+
   const roadThickness = 0.01;
 
-  // choose a base scale for how many world units equal one texture repeat
+  // base scale for how many world units equal one texture repeat
   // Increase this value to make each texture tile larger along the road
-  // (fewer repeats). Previously 10 produced small, closely spaced marks.
-  const textureScaleU = 100; // try 30 (bigger = more stretched along road)
+  const textureScaleU = 100; // (bigger = more stretched along road)
 
   const shape = new THREE.Shape();
 
