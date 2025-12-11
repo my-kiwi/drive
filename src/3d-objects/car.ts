@@ -3,6 +3,15 @@ import * as THREE from 'three';
 import { Controls, DEFAULT_DX } from '../controls/controls';
 import { loadModel } from '../utils/model-loader';
 
+export const carConfig = {
+  position: {
+    x: 0,
+    y: 0.05, // slightly above road
+    z: 10,
+  },
+  maxSpeed: 80, // units per second
+};
+
 type CarModelObjetKey =
   | 'body'
   | 'glass'
@@ -129,7 +138,6 @@ interface VehiclePhysics {
   acceleration: number; // Current acceleration
   orientation: number; // Current orientation in radians
   steering: number; // Current steering angle in radians
-  maxVelocity: number; // Maximum velocity
   accelerationRate: number; // How fast we gain speed
   brakeRate: number; // How fast we brake
   frictionRate: number; // How fast we slow down naturally
@@ -144,7 +152,6 @@ function createVehiclePhysics(): VehiclePhysics {
     acceleration: 0,
     orientation: Math.PI, // Facing sun initially
     steering: 0,
-    maxVelocity: 80, // Units per second
     accelerationRate: 7, // Units per second squared
     brakeRate: 25, // Units per second squared
     frictionRate: 10, // Units per second squared
@@ -178,8 +185,8 @@ function updateVehiclePhysics(
 
   // Clamp velocity to max speed
   physics.velocity = Math.max(
-    -physics.maxVelocity,
-    Math.min(physics.maxVelocity, physics.velocity)
+    -carConfig.maxSpeed / 3, // max reverse speed
+    Math.min(carConfig.maxSpeed, physics.velocity)
   );
 
   // If we're nearly stopped, just stop
@@ -269,7 +276,7 @@ const createCarModel = async (): Promise<CarModel> => {
 
   // scale and position
   carModel.scale.set(1, 1, 1);
-  carModel.position.set(0, 0.05 /*slightly above road*/, 0);
+  carModel.position.set(carConfig.position.x, carConfig.position.y, carConfig.position.z);
 
   return carModel;
 };
