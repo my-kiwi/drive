@@ -19,7 +19,7 @@ const getRoadPath = () => {
   const roadSegmentLength = roadLength / roadSegments;
 
   // start from -halfLength to center the road at origin
-  for (let i = -roadSegments; i <= roadSegments; i++) {
+  for (let i = 0; i <= roadSegments; i++) {
     roadPath.push(new THREE.Vector2(i * roadSegmentLength, zTurns[Math.abs(i)] || 0));
   }
   return roadPath;
