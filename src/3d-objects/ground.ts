@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { loadTexture } from '../utils/texture-loader';
 import { Constants } from '../constants';
-import { getRenderer } from '../renderer';
 
 export const createGround = async (): Promise<THREE.Mesh | THREE.Group> => {
   const groundTexture = await loadTexture('crack-dirt.jpg');

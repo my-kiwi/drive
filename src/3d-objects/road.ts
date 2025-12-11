@@ -23,7 +23,7 @@ const getRoadPath = () => {
     roadPath.push(new THREE.Vector2(i * roadSegmentLength, zTurns[Math.abs(i)] || 0));
   }
   return roadPath;
-}
+};
 
 export const roadState = {
   path: getRoadPath(),
@@ -35,10 +35,15 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
   roadTexture.needsUpdate = true;
 
-  const curve = new THREE.CatmullRomCurve3(roadState.path.map((p) => new THREE.Vector3(
-    p.x,
-    0, // is actually the height (should be z) but the extrude geometry is rotated later
-    p.y))
+  const curve = new THREE.CatmullRomCurve3(
+    roadState.path.map(
+      (p) =>
+        new THREE.Vector3(
+          p.x,
+          0, // is actually the height (should be z) but the extrude geometry is rotated later
+          p.y
+        )
+    )
   );
 
   const roadThickness = 0.01;
@@ -55,10 +60,7 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   shape.lineTo(-roadThickness / 2, roadConfig.width / 2);
   shape.closePath();
 
-  const extrudeSettings: THREE.ExtrudeGeometryOptions = createExtrudeSettings(
-    curve,
-    textureScaleU
-  );
+  const extrudeSettings: THREE.ExtrudeGeometryOptions = createExtrudeSettings(curve, textureScaleU);
 
   const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 
@@ -68,8 +70,7 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   roadTexture.needsUpdate = true;
 
   // set anisotropy for crisper texture at oblique angles
-  const maxAniso = getRenderer().capabilities.getMaxAnisotropy();
-  roadTexture.anisotropy = maxAniso;
+  roadTexture.anisotropy = getRenderer().capabilities.getMaxAnisotropy();
 
   const material = new THREE.MeshStandardMaterial({
     map: roadTexture,
