@@ -57,12 +57,23 @@ let lastTime = performance.now();
 const startTime = lastTime;
 let elapsedSeconds = 0;
 
+let lastLoggedSecond = -1;
+const logCarPosition = () => {
+  if (Math.floor(elapsedSeconds) % 1 === 0 && Math.floor(elapsedSeconds) !== lastLoggedSecond) {
+    lastLoggedSecond = Math.floor(elapsedSeconds);
+    console.log(
+      `Car position: x=${car.model.position.x.toFixed(2)}, y=${car.model.position.y.toFixed(2)}, z=${car.model.position.z.toFixed(2)}`
+    );
+  }
+};
+
 // Animation loop
 const animate = () => {
   const currentTime = performance.now();
   const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
   lastTime = currentTime;
   elapsedSeconds = (currentTime - startTime) / 1000;
+  logCarPosition();
 
   if (isSwitchToNightEnabled) {
     // update scene darkess based time elapsed
