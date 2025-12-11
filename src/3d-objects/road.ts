@@ -8,8 +8,8 @@ export const roadConfig = {
   length: Constants.MAP_SIZE,
 };
 
-const getRoadPath = () => {
-  const roadPath: THREE.Vector2[] = [];
+const getRoadCurve = () => {
+  const roadPath: THREE.Vector3[] = [];
   const roadLength = Constants.MAP_SIZE;
 
   const zTurns = [0, -10, 10, 150, -150, 0, 100, -100, 0, 150, 0];
@@ -20,31 +20,29 @@ const getRoadPath = () => {
 
   // start from -halfLength to center the road at origin
   for (let i = 0; i <= roadSegments; i++) {
-    roadPath.push(new THREE.Vector2(i * roadSegmentLength, zTurns[Math.abs(i)] || 0));
+    roadPath.push(
+      new THREE.Vector3(
+        i * roadSegmentLength,
+        0, // flat road at y=0
+        zTurns[Math.abs(i)] || 0
+      )
+    );
   }
-  return roadPath;
+
+  return new THREE.CatmullRomCurve3(roadPath);
 };
 
 export const roadState = {
-  path: getRoadPath(),
+  curve: getRoadCurve(),
 };
+
+console.log('road curve:', roadState.curve);
 
 export const createRoad = async (): Promise<THREE.Mesh> => {
   const roadTexture = await loadTexture('road.jpg');
 
   roadTexture.wrapS = roadTexture.wrapT = THREE.RepeatWrapping;
   roadTexture.needsUpdate = true;
-
-  const curve = new THREE.CatmullRomCurve3(
-    roadState.path.map(
-      (p) =>
-        new THREE.Vector3(
-          p.x,
-          0, // is actually the height (should be z) but the extrude geometry is rotated later
-          p.y
-        )
-    )
-  );
 
   const roadThickness = 0.01;
 
@@ -60,7 +58,10 @@ export const createRoad = async (): Promise<THREE.Mesh> => {
   shape.lineTo(-roadThickness / 2, roadConfig.width / 2);
   shape.closePath();
 
-  const extrudeSettings: THREE.ExtrudeGeometryOptions = createExtrudeSettings(curve, textureScaleU);
+  const extrudeSettings: THREE.ExtrudeGeometryOptions = createExtrudeSettings(
+    roadState.curve,
+    textureScaleU
+  );
 
   const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 
@@ -93,7 +94,7 @@ const createExtrudeSettings = (curve: THREE.Curve<THREE.Vector3>, textureScaleU:
   // nearest point on the curve and produce stable U (distance) coordinates
   // and signed V (across-road) coordinates. This avoids small per-face
   // UVs and the brick-like tiling seen earlier.
-  const extrudeSteps = roadState.path.length * 50; // more steps = smoother road
+  const extrudeSteps = roadState.curve.points.length * 50; // more steps = smoother road
   const sampleDivisions = Math.max(100, extrudeSteps * 8);
   const samplePoints: THREE.Vector3[] = [];
   const sampleTangents: THREE.Vector3[] = [];
