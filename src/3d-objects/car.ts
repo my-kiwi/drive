@@ -74,7 +74,39 @@ export const createCar = async () => {
   const model = await createCarModel();
   const headlights = addHeadlights(model);
   const physics = createVehiclePhysics();
+  let collided = false;
+  let collisionTime = 0;
+  const collisionDuration = 0.5; // seconds to recover from collision
+  const impactDeceleration = 50; // units/s² to brake on impact
+
+  const collide = () => {
+    if (!collided) {
+      collided = true;
+      collisionTime = 0;
+      // Apply sudden deceleration
+      physics.velocity *= 0.3; // lose 70% of velocity instantly
+    }
+  };
   const update = (deltaTime: number, controls: Controls) => {
+    // Handle collision recovery
+    if (collided) {
+      collisionTime += deltaTime;
+      if (collisionTime < collisionDuration) {
+        // Continue braking during collision recovery period
+        physics.velocity -= Math.sign(physics.velocity) * impactDeceleration * deltaTime;
+        // Tilt the car during impact for visual effect
+        model.rotation.z = Math.sin((collisionTime * Math.PI) / collisionDuration) * 0.05;
+        // Stop completely before exiting collision state
+        if (Math.abs(physics.velocity) < 0.1) {
+          physics.velocity = 0;
+        }
+      } else {
+        // Collision recovery complete
+        collided = false;
+        model.rotation.z = 0; // reset tilt
+      }
+      return; // Don't process normal movement during collision
+    }
     // Update physics
     updateVehiclePhysics(physics, controls, deltaTime);
 
@@ -129,6 +161,7 @@ export const createCar = async () => {
   return {
     model,
     update,
+    collide,
     switchHeadlights,
   };
 };

@@ -6,6 +6,7 @@ export const addCarsToRoad = (scene: THREE.Scene) => {
   const roadDivisions = roadState.curve.getPoints(1000); // FIXME magic number
 
   let lastPoint: THREE.Vector3 | null = null;
+  const otherCars: THREE.Object3D[] = [];
 
   roadDivisions.forEach((_point, index) => {
     const otherCar = getOtherCar(0xff0000 + index * 1000);
@@ -26,5 +27,7 @@ export const addCarsToRoad = (scene: THREE.Scene) => {
 
     scene.add(otherCar);
     lastPoint = point;
+    otherCars.push(otherCar);
   });
+  return otherCars;
 };

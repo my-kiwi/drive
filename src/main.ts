@@ -10,6 +10,7 @@ import { createGround } from './3d-objects/ground';
 import { Constants } from './constants';
 import { loadOtherCars } from './3d-objects/other-cars';
 import { addCarsToRoad } from './obstacles';
+import { checkCollisions } from './collisions';
 
 const isSwitchToNightEnabled = true;
 
@@ -47,7 +48,7 @@ scene.add(car.model);
 
 await loadOtherCars();
 
-await addCarsToRoad(scene);
+let otherCars = addCarsToRoad(scene);
 // Set car as camera target
 cameraController.setTarget(car.model);
 
@@ -92,7 +93,17 @@ const animate = () => {
   }
 
   controls.update();
+  const collisionCar = checkCollisions(car.model, otherCars);
+  if (collisionCar) {
+    // simple collision response: stop the car
+    console.log('Collision detected! Stopping the car.');
+    // remove collision car from otherCars to avoid multiple collision detections
+    collisionCar.removeFromParent();
+    otherCars = otherCars.filter((c) => c !== collisionCar);
+    car.collide();
+  }
   car.update(deltaTime, controls);
+
   cameraController.update();
 
   renderer.render(scene, cameraController.camera);
