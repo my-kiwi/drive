@@ -8,22 +8,30 @@ const assetsFileName = 'vehicles_asset_v1.glb'; // credits: https://opengameart.
 const carName = 'car-hatchback-blue'; // TODO get other types of car
 
 let otherCarsScene: THREE.Group | null = null;
+let otherCar: THREE.Object3D | null = null;
+
+// todo add state
 
 export const loadOtherCars = async () => {
   otherCarsScene = (await loadModel(assetsFileName)).scene;
-};
-
-export const getOtherCar = (color: THREE.ColorRepresentation = 0x0000ff): THREE.Object3D => {
   if (!otherCarsScene) {
     throw new Error('Other cars not loaded yet');
   }
-  const car = otherCarsScene.getObjectByName(carName) as CarModel;
+  const car = otherCarsScene.getObjectByName(carName);
   if (!car) {
     throw new Error(`Car with name ${carName} not found`);
   }
+  otherCar = car;
+};
 
+export const getOtherCar = (color: THREE.ColorRepresentation = 0x0000ff): THREE.Object3D => {
   // the names of the meshes are in their material names
+  if (!otherCar) {
+    throw new Error(`Car with name ${carName} not found`);
+  }
+  const car = otherCar.clone(true);
   const carMeshes = getMeshes(car);
+  console.log({ carMeshes });
 
   carMeshes.carmaterial_blue.material = new THREE.MeshPhysicalMaterial({
     color,
@@ -56,7 +64,10 @@ export const getOtherCar = (color: THREE.ColorRepresentation = 0x0000ff): THREE.
     roughness: 0.7,
   });
 
-  return car.clone();
+  car.scale.set(2, 2, 2);
+  otherCar.position.y += 0.1; // slightly above the road
+
+  return car;
 };
 
 const getMeshes = (car: CarModel): Record<CarModelObjetKey, THREE.Mesh> =>

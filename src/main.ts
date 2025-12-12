@@ -8,7 +8,8 @@ import { createRoad } from './3d-objects/road';
 import { loadTexture } from './utils/texture-loader';
 import { createGround } from './3d-objects/ground';
 import { Constants } from './constants';
-import { getOtherCar, loadOtherCars } from './3d-objects/other-cars';
+import { loadOtherCars } from './3d-objects/other-cars';
+import { addCarsToRoad } from './obstacles';
 
 const isSwitchToNightEnabled = true;
 
@@ -45,12 +46,8 @@ scene.add(car.model);
 //scene.add(buildings);
 
 await loadOtherCars();
-const otherCar = getOtherCar();
-otherCar.position.set(0, 0, 20);
-otherCar.scale.set(2, 2, 2);
-otherCar.rotation.set(0, Math.PI, 0);
-scene.add(otherCar);
 
+await addCarsToRoad(scene);
 // Set car as camera target
 cameraController.setTarget(car.model);
 
