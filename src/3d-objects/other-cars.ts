@@ -2,7 +2,14 @@ import { loadModel } from '../utils/model-loader';
 import * as THREE from 'three';
 
 type CarModel = THREE.Object3D<THREE.Object3DEventMap>;
-type CarModelObjetKey = 'carmaterial_blue' | 'windows' | 'metal' | 'tires' | 'lights';
+type CarModelObjetKey =
+  | 'carmaterial_blue'
+  | 'windows'
+  | 'metal'
+  | 'tires'
+  | 'lights'
+  | 'lights.red'
+  | 'lights.orange';
 
 const assetsFileName = 'vehicles_asset_v1.glb'; // credits: https://opengameart.org/content/vehicles-assets-pt1
 const carName = 'car-hatchback-blue'; // TODO get other types of car
@@ -31,8 +38,8 @@ export const getOtherCar = (color: THREE.ColorRepresentation = 0x0000ff): THREE.
   }
   const car = otherCar.clone(true);
   const carMeshes = getMeshes(car);
-  console.log({ carMeshes });
 
+  // body
   carMeshes.carmaterial_blue.material = new THREE.MeshPhysicalMaterial({
     color,
     metalness: 1,
@@ -41,27 +48,49 @@ export const getOtherCar = (color: THREE.ColorRepresentation = 0x0000ff): THREE.
     clearcoatRoughness: 0.03,
   });
 
-  // details material
+  // lights
   carMeshes.lights.material = new THREE.MeshStandardMaterial({
-    //yellow
     color: 0xffffaa,
     metalness: 1.0,
     roughness: 0.5,
     emissive: 0xffffaa,
   });
+  carMeshes.lights.layers.enable(1);
+  carMeshes['lights.red'].material = new THREE.MeshStandardMaterial({
+    color: 0xff0000,
+    metalness: 1.0,
+    roughness: 0.5,
+    emissive: 0xff0000,
+  });
+  carMeshes['lights.red'].layers.enable(1);
+  carMeshes['lights.orange'].material = new THREE.MeshStandardMaterial({
+    color: 0xffaa00,
+    metalness: 1.0,
+    roughness: 0.5,
+    emissive: 0xffaa00,
+  });
+  carMeshes['lights.orange'].layers.enable(1);
 
-  // glass material
+  // glass
   carMeshes.windows.material = new THREE.MeshPhysicalMaterial({
     color: 0xffffff,
     metalness: 1,
     roughness: 0,
-    transmission: 1.0,
+    transmission: 0.9,
   });
 
+  // tires
   carMeshes.tires.material = new THREE.MeshStandardMaterial({
     color: 0x111111,
     metalness: 0.3,
     roughness: 0.7,
+  });
+
+  // metal
+  carMeshes.metal.material = new THREE.MeshStandardMaterial({
+    color: 0x888888,
+    metalness: 1.0,
+    roughness: 0.4,
   });
 
   car.scale.set(2, 2, 2);
