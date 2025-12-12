@@ -94,7 +94,7 @@ export const getOtherCar = (color: THREE.ColorRepresentation = 0x0000ff): THREE.
   });
 
   car.scale.set(2, 2, 2);
-  otherCar.position.y += 0.1; // slightly above the road
+  car.position.y += 0.1; // slightly above the road
 
   return car;
 };
