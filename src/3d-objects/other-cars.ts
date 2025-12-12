@@ -1,0 +1,72 @@
+import { loadModel } from '../utils/model-loader';
+import * as THREE from 'three';
+
+type CarModel = THREE.Object3D<THREE.Object3DEventMap>;
+type CarModelObjetKey = 'carmaterial_blue' | 'windows' | 'metal' | 'tires' | 'lights';
+
+const assetsFileName = 'vehicles_asset_v1.glb'; // credits: https://opengameart.org/content/vehicles-assets-pt1
+const carName = 'car-hatchback-blue'; // TODO get other types of car
+
+let otherCarsScene: THREE.Group | null = null;
+
+export const loadOtherCars = async () => {
+  otherCarsScene = (await loadModel(assetsFileName)).scene;
+};
+
+export const getOtherCar = (color: THREE.ColorRepresentation = 0x0000ff): THREE.Object3D => {
+  if (!otherCarsScene) {
+    throw new Error('Other cars not loaded yet');
+  }
+  const car = otherCarsScene.getObjectByName(carName) as CarModel;
+  if (!car) {
+    throw new Error(`Car with name ${carName} not found`);
+  }
+
+  // the names of the meshes are in their material names
+  const carMeshes = getMeshes(car);
+
+  carMeshes.carmaterial_blue.material = new THREE.MeshPhysicalMaterial({
+    color,
+    metalness: 1,
+    roughness: 0.5,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.03,
+  });
+
+  // details material
+  carMeshes.lights.material = new THREE.MeshStandardMaterial({
+    //yellow
+    color: 0xffffaa,
+    metalness: 1.0,
+    roughness: 0.5,
+    emissive: 0xffffaa,
+  });
+
+  // glass material
+  carMeshes.windows.material = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    metalness: 1,
+    roughness: 0,
+    transmission: 1.0,
+  });
+
+  carMeshes.tires.material = new THREE.MeshStandardMaterial({
+    color: 0x111111,
+    metalness: 0.3,
+    roughness: 0.7,
+  });
+
+  return car.clone();
+};
+
+const getMeshes = (car: CarModel): Record<CarModelObjetKey, THREE.Mesh> =>
+  car.children
+    .map((child) => child as THREE.Mesh)
+    .reduce(
+      (acc, child) => {
+        const name = (child.material as any).name;
+        acc[name as CarModelObjetKey] = child;
+        return acc;
+      },
+      {} as Record<CarModelObjetKey, THREE.Mesh>
+    );
