@@ -7,10 +7,10 @@ function isColliding(a: THREE.Object3D, b: THREE.Object3D, radius = 2 /**FIXME m
   return dx * dx + dz * dz < radius * radius;
 }
 
-export const checkCollisions = (car: THREE.Object3D, otherCars: THREE.Object3D[]) => {
-  for (const otherCar of otherCars) {
-    if (isColliding(car, otherCar)) {
-      return otherCar;
+export const checkCollisions = (car: THREE.Object3D, otherObjects: THREE.Object3D[]) => {
+  for (const otherObject of otherObjects) {
+    if (isColliding(car, otherObject)) {
+      return otherObject;
     }
   }
 };
