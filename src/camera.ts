@@ -20,9 +20,9 @@ export function createCamera(): CameraController {
   // Camera settings
   const settings = {
     mode: 'follow' as 'follow' | 'orbit',
-    distance: 4, // Negative distance to position behind car
-    height: 3, // Height above car
-    lookAhead: -2, // Negative value to look ahead of car from behind
+    distance: 8, // Negative distance to position behind car
+    height: 6, // Height above car
+    lookAhead: -8, // Negative value to look ahead of car from behind
   };
 
   // Orbit controls for free camera mode
