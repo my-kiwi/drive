@@ -7,11 +7,15 @@
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
-    <div class="game-timer">00:00</div>
+    <div class="hud">
+      <div class="game-timer">00:00</div>
+      <div class="game-bonus">Bonus: <span class="game-bonus-count">0</span></div>
+    </div>
 
     <div class="game-overlay" aria-hidden="true">
-      <div class="game-overlay-inner" >
+      <div class="game-overlay-inner">
         <div class="game-over-title">Game Over</div>
+        <div class="game-over-score">Score: <span class="game-over-bonus">0</span></div>
         <button class="game-restart-btn">Restart</button>
       </div>
     </div>

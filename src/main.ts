@@ -53,6 +53,7 @@ await loadBonus();
 
 let otherCars = addCarsToRoad(scene);
 let bonus = addBonus(scene);
+let bonusCount = 0;
 // Set car as camera target
 cameraController.setTarget(car.model);
 
@@ -116,7 +117,8 @@ const animate = () => {
     // remove bonus from scene
     bonusCollected.removeFromParent();
     bonus = bonus.filter((b) => b !== bonusCollected);
-    // points ++
+    // increment bonus count and update GUI next frame
+    bonusCount += 1;
   }
   bonus.forEach((b) => b.rotateY(deltaTime)); // simple rotation animation
 
@@ -125,6 +127,6 @@ const animate = () => {
   cameraController.update();
 
   renderer.render(scene, cameraController.camera);
-  updateGui(elapsedSeconds);
+  updateGui(elapsedSeconds, bonusCount);
 };
 renderer.setAnimationLoop(animate);

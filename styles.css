@@ -55,6 +55,31 @@ main {
   z-index: 9999;
 }
 
+.hud {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  left: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  z-index: 9999;
+}
+
+.game-bonus {
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-family: monospace, system-ui, sans-serif;
+  font-size: 18px;
+  border-radius: 6px;
+}
+
+.game-over-score {
+  margin-bottom: 12px;
+  font-size: 20px;
+}
+
 .game-overlay {
   position: fixed;
   left: 0;

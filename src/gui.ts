@@ -1,18 +1,24 @@
 import { getRenderer } from './renderer';
 
 const GAME_DURATION = 90; // seconds
+const SCORE_MULTIPLIER = 10;
 let gameOver = false;
 
-export const updateGui = (elapsedSeconds: number) => {
+export const updateGui = (elapsedSeconds: number, bonusCount: number) => {
+  const score = bonusCount * SCORE_MULTIPLIER;
   // update timer display and check for end of game
   if (timerEl && !gameOver) {
     const remaining = GAME_DURATION - elapsedSeconds;
+    timerEl.innerText = formatTime(remaining > 0 ? remaining : 0);
     if (remaining <= 0) {
-      timerEl.innerText = formatTime(0);
-      endGame();
-    } else {
-      timerEl.innerText = formatTime(remaining);
+      // game over
+      endGame(score);
     }
+  }
+
+  const bonusEl = document.querySelector('.game-bonus-count') as HTMLSpanElement | null;
+  if (bonusEl) {
+    bonusEl.innerText = String(score);
   }
 };
 
@@ -20,6 +26,7 @@ export const updateGui = (elapsedSeconds: number) => {
 const timerEl = document.querySelector('.game-timer') as HTMLDivElement | null;
 const overlay = document.querySelector('.game-overlay') as HTMLDivElement | null;
 const restartBtn = document.querySelector('.game-restart-btn') as HTMLButtonElement | null;
+const overlayBonusEl = document.querySelector('.game-over-bonus') as HTMLSpanElement | null;
 
 if (restartBtn)
   restartBtn.addEventListener('click', () => {
@@ -36,7 +43,7 @@ function formatTime(seconds: number) {
   return `${mm}:${ss}`;
 }
 
-function endGame() {
+function endGame(score: number) {
   if (gameOver) {
     return;
   }
@@ -45,9 +52,10 @@ function endGame() {
   getRenderer().setAnimationLoop(null);
   if (overlay) {
     overlay.style.visibility = 'visible';
+    // show collected bonus count if available in the HUD
+    const hudBonus = document.querySelector('.game-bonus-count') as HTMLSpanElement | null;
+    if (overlayBonusEl && hudBonus) {
+      overlayBonusEl.innerText = String(score);
+    }
   }
 }
-
-// Update timer inside the existing animate loop by wrapping the old function
-// We already set `renderer.setAnimationLoop(animate)` above; the animate closure
-// will update `elapsedSeconds` which is in scope.
