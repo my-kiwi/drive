@@ -4,17 +4,15 @@ import { getOtherCar } from './3d-objects/other-cars';
 
 // TODO improve performance by reusing objects and adding them when not to far from the camera
 
-
-
 export const addCarsToRoad = (scene: THREE.Scene) => {
-const carPool: THREE.Object3D[] = [
-  getOtherCar(0xff0000),
-  getOtherCar(0x00ff00),
-  getOtherCar(0x0000ff),
-  getOtherCar(0xffff00),
-  getOtherCar(0xff00ff),
-  getOtherCar(0x00ffff),
-];
+  const carPool: THREE.Object3D[] = [
+    getOtherCar(0xff0000), // red
+    getOtherCar(0x00ff00), // green
+    getOtherCar(0x0000ff), // blue
+    getOtherCar(0xffff00), // yellow
+    getOtherCar(0xff00ff), // magenta
+    getOtherCar(0x00ffff), // cyan
+  ];
 
   // Smarter car placement along the road:
   // - sample the road curve at a fixed resolution
@@ -24,7 +22,7 @@ const carPool: THREE.Object3D[] = [
   const SAMPLE_DIVS = 8000; // sampling resolution along curve
   const MIN_SPACING = 18; // minimum distance (world units) between cars
   const BASE_PROB = 0.03; // base spawn probability at t=0
-  const MAX_CARS = 60; // safety cap
+  const MAX_CARS = 1000; // safety cap
   const DENSITY_EXPONENT = 2.0; // shapes how strongly density increases along t
 
   const samples = roadState.curve.getPoints(SAMPLE_DIVS);
@@ -72,6 +70,11 @@ const carPool: THREE.Object3D[] = [
     otherCar.position.x += (Math.random() - 0.5) * 1.2;
     otherCar.position.z += (Math.random() - 0.5) * 1.2;
     otherCar.rotation.y += (Math.random() - 0.5) * 0.2;
+
+    const isOnLeftSideOfRoad = side === 1;
+    if (isOnLeftSideOfRoad) {
+      otherCar.rotation.y += Math.PI; // reverse direction
+    }
 
     scene.add(otherCar);
     otherCars.push(otherCar);
