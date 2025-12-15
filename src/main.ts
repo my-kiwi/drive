@@ -24,9 +24,12 @@ const controls = createControls();
 
 const scene = new THREE.Scene();
 
-const texture = await loadTexture('red-sky-at-night-cirrostratus-skydome_1K.exr');
-scene.environment = texture; // set as scene environment for reflections
-scene.background = texture; // Use the prefiltered HDR cubemap as the scene background (sky)
+const texturePromise = loadTexture('red-sky-at-night-cirrostratus-skydome_1K.exr').then(
+  (texture) => {
+    scene.environment = texture; // set as scene environment for reflections
+    scene.background = texture; // Use the prefiltered HDR cubemap as the scene background (sky)
+  }
+);
 
 // and some lights
 // scene.add(createDirectionalLight());
@@ -35,27 +38,40 @@ scene.background = texture; // Use the prefiltered HDR cubemap as the scene back
 scene.fog = new THREE.Fog(0x070202, 10, 150);
 
 // add meshes
-const ground = await createGround();
-scene.add(ground);
+const groundPromise = createGround().then((ground) => {
+  scene.add(ground);
+});
 
-const road = await createRoad();
-scene.add(road);
+const roadPromise = createRoad().then((road) => {
+  scene.add(road);
+});
 
-const car = await createCar();
-car.switchHeadlights(false);
-scene.add(car.model);
+const carPromise = createCar().then((car) => {
+  car.switchHeadlights(false);
+  scene.add(car.model);
+  cameraController.setTarget(car.model);
+  return car;
+});
 
 // const buildings = await createBuildings();
 //scene.add(buildings);
 
-await loadOtherCars();
-await loadBonus();
+const malusPromise = loadOtherCars();
+const bonusPromise = loadBonus();
+
+const [car] = await Promise.all([
+  carPromise,
+  groundPromise,
+  roadPromise,
+  texturePromise,
+  bonusPromise,
+  malusPromise,
+]);
 
 let otherCars = addCarsToRoad(scene);
 let bonus = addBonus(scene);
 let bonusCount = 0;
 // Set car as camera target
-cameraController.setTarget(car.model);
 
 // Add keyboard listener for camera mode toggle
 window.addEventListener('keydown', (e) => {
