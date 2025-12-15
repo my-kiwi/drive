@@ -3,7 +3,7 @@ import { loadTexture } from '../utils/texture-loader';
 import { Constants } from '../constants';
 
 export const createGround = async (): Promise<THREE.Mesh | THREE.Group> => {
-  const groundTexture = await loadTexture('crack-dirt.jpg');
+  const groundTexture = await loadTexture('crack-dirt-2.jpeg');
 
   const groundWidth = Constants.MAP_SIZE;
   const groundLength = Constants.MAP_SIZE;
