@@ -95,7 +95,7 @@ export const getOtherCar = (color: THREE.ColorRepresentation = 0x0000ff): THREE.
   return car;
 };
 
-  // the names of the meshes are in their material names
+// the names of the meshes are in their material names
 const getMeshes = (car: CarModel): Record<CarModelObjetKey, THREE.Mesh> =>
   car.children
     .map((child) => child as THREE.Mesh)

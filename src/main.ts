@@ -11,6 +11,7 @@ import { Constants } from './constants';
 import { loadOtherCars } from './3d-objects/other-cars';
 import { addCarsToRoad } from './obstacles';
 import { checkCollisions } from './collisions';
+import { addBonus, loadBonus } from './bonus';
 
 const isSwitchToNightEnabled = false;
 
@@ -47,8 +48,10 @@ scene.add(car.model);
 //scene.add(buildings);
 
 await loadOtherCars();
+await loadBonus();
 
 let otherCars = addCarsToRoad(scene);
+let bonus = addBonus(scene);
 // Set car as camera target
 cameraController.setTarget(car.model);
 
@@ -93,6 +96,8 @@ const animate = () => {
   }
 
   controls.update();
+
+  // malus handling
   const collisionCar = checkCollisions(car.model, otherCars);
   if (collisionCar) {
     // simple collision response: stop the car
@@ -102,6 +107,18 @@ const animate = () => {
     otherCars = otherCars.filter((c) => c !== collisionCar);
     car.collide();
   }
+
+  // bonus handling
+  const bonusCollected = checkCollisions(car.model, bonus);
+  if (bonusCollected) {
+    console.log('Bonus collected!');
+    // remove bonus from scene
+    bonusCollected.removeFromParent();
+    bonus = bonus.filter((b) => b !== bonusCollected);
+    // points ++
+  }
+  bonus.forEach((b) => b.rotateY(deltaTime)); // simple rotation animation
+
   car.update(deltaTime, controls);
 
   cameraController.update();
