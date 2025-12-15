@@ -26,7 +26,7 @@ export const addBonus = (scene: THREE.Scene) => {
   const SAMPLE_DIVS = 8000; // sampling resolution along curve
   const MIN_SPACING = 18; // minimum distance (world units) between cars
   const BASE_PROB = 0.03; // base spawn probability at t=0
-  const MAX_BONUS = 1000; // safety cap
+  const MAX_BONUS = 100; // safety cap
   const DENSITY_EXPONENT = 2.0; // shapes how strongly density increases along t
 
   const samples = roadState.curve.getPoints(SAMPLE_DIVS);
