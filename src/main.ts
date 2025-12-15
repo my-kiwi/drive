@@ -12,6 +12,7 @@ import { loadOtherCars } from './3d-objects/other-cars';
 import { addCarsToRoad } from './obstacles';
 import { checkCollisions } from './collisions';
 import { addBonus, loadBonus } from './bonus';
+import { updateGui } from './gui';
 
 const isSwitchToNightEnabled = false;
 
@@ -124,5 +125,6 @@ const animate = () => {
   cameraController.update();
 
   renderer.render(scene, cameraController.camera);
+  updateGui(elapsedSeconds);
 };
 renderer.setAnimationLoop(animate);

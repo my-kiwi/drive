@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
+    <div class="game-timer">00:00</div>
+
+    <div class="game-overlay" aria-hidden="true">
+      <div class="game-overlay-inner" >
+        <div class="game-over-title">Game Over</div>
+        <button class="game-restart-btn">Restart</button>
+      </div>
+    </div>
     <script type="module" src="./src/main.ts"></script>
     <script type="module">
       if (window.location.hostname === 'localhost') {
