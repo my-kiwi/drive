@@ -32,7 +32,6 @@ export const loadOtherCars = async () => {
 };
 
 export const getOtherCar = (color: THREE.ColorRepresentation = 0x0000ff): THREE.Object3D => {
-  // the names of the meshes are in their material names
   if (!otherCar) {
     throw new Error(`Car with name ${carName} not found`);
   }
@@ -55,21 +54,18 @@ export const getOtherCar = (color: THREE.ColorRepresentation = 0x0000ff): THREE.
     roughness: 0.5,
     emissive: 0xffffaa,
   });
-  carMeshes.lights.layers.enable(1);
   carMeshes['lights.red'].material = new THREE.MeshStandardMaterial({
     color: 0xff0000,
     metalness: 1.0,
     roughness: 0.5,
     emissive: 0xff0000,
   });
-  carMeshes['lights.red'].layers.enable(1);
   carMeshes['lights.orange'].material = new THREE.MeshStandardMaterial({
     color: 0xffaa00,
     metalness: 1.0,
     roughness: 0.5,
     emissive: 0xffaa00,
   });
-  carMeshes['lights.orange'].layers.enable(1);
 
   // glass
   carMeshes.windows.material = new THREE.MeshPhysicalMaterial({
@@ -99,6 +95,7 @@ export const getOtherCar = (color: THREE.ColorRepresentation = 0x0000ff): THREE.
   return car;
 };
 
+  // the names of the meshes are in their material names
 const getMeshes = (car: CarModel): Record<CarModelObjetKey, THREE.Mesh> =>
   car.children
     .map((child) => child as THREE.Mesh)

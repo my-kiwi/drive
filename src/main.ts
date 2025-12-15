@@ -12,7 +12,7 @@ import { loadOtherCars } from './3d-objects/other-cars';
 import { addCarsToRoad } from './obstacles';
 import { checkCollisions } from './collisions';
 
-const isSwitchToNightEnabled = true;
+const isSwitchToNightEnabled = false;
 
 const renderer = createRenderer();
 document.body.appendChild(renderer.domElement);
