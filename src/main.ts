@@ -24,7 +24,7 @@ const controls = createControls();
 
 const scene = new THREE.Scene();
 
-const texture = await loadTexture('red-sky-at-night-cirrostratus-skydome_2K.exr');
+const texture = await loadTexture('red-sky-at-night-cirrostratus-skydome_1K.exr');
 scene.environment = texture; // set as scene environment for reflections
 scene.background = texture; // Use the prefiltered HDR cubemap as the scene background (sky)
 
