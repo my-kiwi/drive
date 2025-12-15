@@ -11,7 +11,7 @@ type CarModelObjetKey =
   | 'lights.red'
   | 'lights.orange';
 
-const assetsFileName = 'vehicles_asset_v1.glb'; // credits: https://opengameart.org/content/vehicles-assets-pt1
+const assetsFileName = 'vehicles_asset_v4.glb'; // credits: https://opengameart.org/content/vehicles-assets-pt1
 const carName = 'car-hatchback-blue'; // TODO get other types of car
 
 let otherCarsScene: THREE.Group | null = null;
