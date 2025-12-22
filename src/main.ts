@@ -14,7 +14,7 @@ import { checkCollisions } from './collisions';
 import { addBonus, loadBonus } from './bonus';
 import { updateGui } from './gui';
 
-const isSwitchToNightEnabled = false;
+const isSwitchToNightEnabled = true;
 
 const renderer = createRenderer();
 document.body.appendChild(renderer.domElement);
@@ -106,9 +106,9 @@ const animate = () => {
     // update scene darkess based time elapsed
     renderer.toneMappingExposure = Math.max(
       Constants.RENDERER_EXPOSURE.LOW,
-      Constants.RENDERER_EXPOSURE.HIGH - elapsedSeconds / 60
+      Constants.RENDERER_EXPOSURE.HIGH - elapsedSeconds / Constants.NIGHTFALL_DIVISION_FACTOR
     );
-    if (renderer.toneMappingExposure <= Constants.RENDERER_EXPOSURE.LOW * 2) {
+    if (renderer.toneMappingExposure <= Constants.RENDERER_EXPOSURE.NIGHTFALL) {
       car.switchHeadlights(true);
     }
   }
