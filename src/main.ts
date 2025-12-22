@@ -35,7 +35,7 @@ const texturePromise = loadTexture('red-sky-at-night-cirrostratus-skydome_1K.exr
 // scene.add(createDirectionalLight());
 
 // adds fog in the distance
-scene.fog = new THREE.Fog(0x070202, 10, 150);
+scene.fog = new THREE.Fog(0x070202, 10, Constants.FOG_DISTANCE);
 
 // add meshes
 const groundPromise = createGround().then((ground) => {
