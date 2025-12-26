@@ -30,13 +30,8 @@ const texturePromise = loadTexture('red-sky-at-night-cirrostratus-skydome_1K.exr
   }
 );
 
-// and some lights
-// scene.add(createDirectionalLight());
-
-// adds fog in the distance
 scene.fog = new THREE.Fog(0x070202, 10, Constants.FOG_DISTANCE);
 
-// add meshes
 const groundPromise = createGround().then((ground) => {
   scene.add(ground);
 });
@@ -52,12 +47,10 @@ const carPromise = createCar().then((car) => {
   return car;
 });
 
-// const buildings = await createBuildings();
-//scene.add(buildings);
-
 const malusPromise = loadOtherCars();
 const bonusPromise = loadBonus();
 
+// TODO add loading screen while promises are pending
 const [car] = await Promise.all([
   carPromise,
   groundPromise,
