@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { loadTexture } from './utils/texture-loader';
-import { roadConfig, roadState } from './3d-objects/road';
+import { loadTexture } from '../utils/texture-loader';
+import { roadConfig, roadState } from './road';
 
 let bonusPool: THREE.Object3D[] = [];
 

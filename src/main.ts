@@ -10,7 +10,7 @@ import { createGround } from './3d-objects/ground';
 import { Constants } from './constants';
 import { loadOtherCars, buildOtherCars } from './3d-objects/other-cars';
 import { checkCollisions } from './collisions';
-import { addBonus, loadBonus } from './bonus';
+import { addBonus, loadBonus } from './3d-objects/bonus';
 import { updateGui } from './gui';
 
 const isSwitchToNightEnabled = true;
