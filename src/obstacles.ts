@@ -4,7 +4,7 @@ import { getOtherCar } from './3d-objects/other-cars';
 
 // TODO improve performance by reusing objects and adding them when not to far from the camera
 
-export const addCarsToRoad = (scene: THREE.Scene) => {
+export const buildOtherCars = () => {
   const carPool: THREE.Object3D[] = [
     getOtherCar(0xff0000), // red
     getOtherCar(0x00ff00), // green
@@ -76,7 +76,6 @@ export const addCarsToRoad = (scene: THREE.Scene) => {
       otherCar.rotation.y += Math.PI; // reverse direction
     }
 
-    scene.add(otherCar);
     otherCars.push(otherCar);
     lastPlaced = otherCar.position.clone();
 

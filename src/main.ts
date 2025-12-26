@@ -9,7 +9,7 @@ import { loadTexture } from './utils/texture-loader';
 import { createGround } from './3d-objects/ground';
 import { Constants } from './constants';
 import { loadOtherCars } from './3d-objects/other-cars';
-import { addCarsToRoad } from './obstacles';
+import { buildOtherCars } from './obstacles';
 import { checkCollisions } from './collisions';
 import { addBonus, loadBonus } from './bonus';
 import { updateGui } from './gui';
@@ -68,10 +68,11 @@ const [car] = await Promise.all([
   malusPromise,
 ]);
 
-let otherCars = addCarsToRoad(scene);
+let otherCars = buildOtherCars();
 let bonus = addBonus(scene);
 let bonusCount = 0;
-// Set car as camera target
+
+otherCars.forEach((car) => scene.add(car));
 
 // Add keyboard listener for camera mode toggle
 window.addEventListener('keydown', (e) => {
