@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { roadConfig, roadState } from '../3d-objects/road';
 
+type NamedObject3D<T> = THREE.Object3D & { name: T };
+
 export interface SpawnAlongRoadConfig {
   sampleDivisions?: number; // sampling resolution along curve (default 800)
   minSpacing?: number; // minimum distance between objects (default 18)
@@ -8,6 +10,7 @@ export interface SpawnAlongRoadConfig {
   maxObjects?: number; // safety cap on total objects (default 60)
   densityExponent?: number; // shapes how density increases along road (default 2.0)
   heightOffset?: number; // height above ground (default 1)
+  distanceFromCenterOffset?: number; // additional offset to place objects further from road center (default 0)
 }
 
 /**
@@ -23,11 +26,11 @@ export interface SpawnAlongRoadConfig {
  * @param config Spawn configuration (uses sensible defaults)
  * @returns Array of spawned objects
  */
-export const spawnAlongRoad = (
+export const spawnAlongRoad = <T = string>(
   scene: THREE.Scene,
   objectPool: THREE.Object3D[],
   config: SpawnAlongRoadConfig = {}
-): THREE.Object3D[] => {
+): NamedObject3D<T>[] => {
   const SAMPLE_DIVS = config.sampleDivisions ?? 800;
   const MIN_SPACING = config.minSpacing ?? 18;
   const BASE_PROB = config.baseProb ?? 0.03;
@@ -77,9 +80,12 @@ export const spawnAlongRoad = (
     const side = Math.random() < 0.5 ? 'LEFT' : 'RIGHT';
     const sideSign = side === 'LEFT' ? -1 : 1;
     const lateralOffset = (roadConfig.width / 4) * (0.6 + Math.random() * 0.8);
+    const distanceFromCenterOffset = (config.distanceFromCenterOffset ?? 0) * sideSign;
     // compute a lateral vector perpendicular to dir on XZ plane
     const lateral = new THREE.Vector3(dir.z, 0, -dir.x).normalize();
-    obj.position.copy(point).add(lateral.multiplyScalar(lateralOffset * sideSign));
+    obj.position
+      .copy(point)
+      .add(lateral.multiplyScalar(lateralOffset * sideSign + distanceFromCenterOffset));
 
     // small positional jitter and rotation for variety
     obj.position.x += (Math.random() - 0.5) * 1.2;
@@ -99,5 +105,5 @@ export const spawnAlongRoad = (
     if (spawnedObjects.length >= MAX_OBJECTS) break;
   }
 
-  return spawnedObjects;
+  return spawnedObjects as NamedObject3D<T>[];
 };

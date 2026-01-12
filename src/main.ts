@@ -12,6 +12,7 @@ import { loadOtherCars, buildOtherCars } from './3d-objects/other-cars';
 import { checkCollisions } from './collisions';
 import { addBonus, loadBonus } from './3d-objects/bonus';
 import { updateGui } from './gui';
+import { addStreetItems, loadStreetItems } from './3d-objects/street-items';
 
 const isSwitchToNightEnabled = true;
 
@@ -50,6 +51,8 @@ const carPromise = createCar().then((car) => {
 const malusPromise = loadOtherCars();
 const bonusPromise = loadBonus();
 
+const streetItemsPromise = loadStreetItems();
+
 // TODO add loading screen while promises are pending
 const [car] = await Promise.all([
   carPromise,
@@ -58,6 +61,7 @@ const [car] = await Promise.all([
   texturePromise,
   bonusPromise,
   malusPromise,
+  streetItemsPromise,
 ]);
 
 let otherCars = buildOtherCars();
@@ -65,6 +69,7 @@ let bonus = addBonus(scene);
 let bonusCount = 0;
 
 otherCars.forEach((car) => scene.add(car));
+let streetItems = addStreetItems(scene);
 
 // Add keyboard listener for camera mode toggle
 window.addEventListener('keydown', (e) => {
@@ -117,6 +122,15 @@ const animate = () => {
     collisionCar.removeFromParent();
     otherCars = otherCars.filter((c) => c !== collisionCar);
     car.collide();
+  }
+  const streetItemCollision = checkCollisions(car.model, streetItems);
+  if (streetItemCollision) {
+    console.log('Collision with street item detected!');
+    streetItemCollision.removeFromParent();
+    streetItems = streetItems.filter((item) => item !== streetItemCollision);
+    if (streetItemCollision.name !== 'Traffic_Cone') {
+      car.collide();
+    }
   }
 
   // bonus handling
