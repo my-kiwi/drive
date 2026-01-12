@@ -15,6 +15,7 @@ import { updateGui } from './gui';
 import { addStreetItems, loadStreetItems } from './3d-objects/street-items';
 
 const isSwitchToNightEnabled = true;
+const forceNightTime = false; // for testing purposes
 
 const renderer = createRenderer();
 document.body.appendChild(renderer.domElement);
@@ -100,11 +101,13 @@ const animate = () => {
   elapsedSeconds = (currentTime - startTime) / 1000;
   logCarPosition();
 
-  if (isSwitchToNightEnabled) {
+  if (isSwitchToNightEnabled || forceNightTime) {
     // update scene darkess based time elapsed
+    const updatedExposure =
+      Constants.RENDERER_EXPOSURE.HIGH - elapsedSeconds / Constants.NIGHTFALL_DIVISION_FACTOR;
     renderer.toneMappingExposure = Math.max(
       Constants.RENDERER_EXPOSURE.LOW,
-      Constants.RENDERER_EXPOSURE.HIGH - elapsedSeconds / Constants.NIGHTFALL_DIVISION_FACTOR
+      forceNightTime ? Constants.RENDERER_EXPOSURE.NIGHTFALL : updatedExposure
     );
     if (renderer.toneMappingExposure <= Constants.RENDERER_EXPOSURE.NIGHTFALL) {
       car.switchHeadlights(true);

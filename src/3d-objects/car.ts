@@ -3,6 +3,18 @@ import * as THREE from 'three';
 import { Controls, DEFAULT_DX } from '../controls/controls';
 import { loadModel } from '../utils/model-loader';
 
+type CarSetup = {
+  fileName: string;
+  yFlipped: boolean;
+};
+const cars = [
+  { fileName: 'jdm-car.glb', yFlipped: false }, // credits: https://www.blenderkit.com/asset-gallery-detail/ab0b231a-8351-422f-b55f-108faa77641d/
+  { fileName: 'ferrari.glb', yFlipped: true }, // FIXME comes from threejs example, not sure if I will keep it
+];
+
+// TODO allow car selection
+export const selectedCar: CarSetup = cars[0];
+
 export const carConfig = {
   position: {
     x: 0,
@@ -28,7 +40,7 @@ type CarModelObjetKey =
 type CarModel = Omit<THREE.Object3D<THREE.Object3DEventMap>, 'getObjectByName'> & {
   // "key" is defined but never used => it's a type definition stupid linter
   // eslint-disable-next-line no-unused-vars
-  getObjectByName(key: CarModelObjetKey): THREE.Mesh;
+  getObjectByName(key: CarModelObjetKey): THREE.Mesh | undefined;
 };
 
 const addHeadlights = (carModel: CarModel) => {
@@ -36,10 +48,10 @@ const addHeadlights = (carModel: CarModel) => {
   const createSpotlight = () => {
     const spotlight = new THREE.SpotLight(0xffeeaa, 5000, 1000, Math.PI / 8, 0.5, 2);
     spotlight.position.y = 1.2;
-    spotlight.position.z = -1.2;
+    spotlight.position.z = selectedCar.yFlipped ? -1.2 : 1.2;
 
     spotlight.target.position.y = 0.1;
-    spotlight.target.position.z = -60;
+    spotlight.target.position.z = selectedCar.yFlipped ? -60 : 60;
 
     // spotlight.rotation.z = -Math.PI / 2;
     return spotlight;
@@ -57,8 +69,7 @@ const addHeadlights = (carModel: CarModel) => {
   const createBacklight = () => {
     const backlight = new THREE.RectAreaLight(0xff0000, 500, 0.1, 0.1);
     backlight.position.y = 0.5;
-    backlight.position.z = 2.0;
-    backlight.rotation.y = Math.PI; // face backwards
+    backlight.position.z = selectedCar.yFlipped ? 2.0 : -2.0;
     return backlight;
   };
   const backlightLeft = createBacklight();
@@ -124,28 +135,30 @@ export const createCar = async () => {
     const spinQ = new THREE.Quaternion(); // For wheel spinning (forward/backward)
     const steerQ = new THREE.Quaternion(); // For wheel steering (left/right)
 
-    // Apply rotations to rear wheels (only spin, no steering)
-    wheelRL.rotation.x -= rotationAngle;
-    wheelRR.rotation.x -= rotationAngle;
+    if (wheelFL && wheelFR && wheelRL && wheelRR) {
+      // Apply rotations to rear wheels (only spin, no steering)
+      wheelRL.rotation.x -= rotationAngle;
+      wheelRR.rotation.x -= rotationAngle;
 
-    // Update accumulated spin for front wheels
-    wheelFL.userData.spinRotation = (wheelFL.userData.spinRotation || 0) - rotationAngle;
-    wheelFR.userData.spinRotation = (wheelFR.userData.spinRotation || 0) - rotationAngle;
+      // Update accumulated spin for front wheels
+      wheelFL.userData.spinRotation = (wheelFL.userData.spinRotation || 0) - rotationAngle;
+      wheelFR.userData.spinRotation = (wheelFR.userData.spinRotation || 0) - rotationAngle;
 
-    // Front wheels: combine steering and spinning
-    // Set up rotation quaternions
-    spinQ.setFromAxisAngle(new THREE.Vector3(1, 0, 0), wheelFL.userData.spinRotation);
-    steerQ.setFromAxisAngle(new THREE.Vector3(0, 1, 0), physics.steering);
+      // Front wheels: combine steering and spinning
+      // Set up rotation quaternions
+      spinQ.setFromAxisAngle(new THREE.Vector3(1, 0, 0), wheelFL.userData.spinRotation);
+      steerQ.setFromAxisAngle(new THREE.Vector3(0, 1, 0), physics.steering);
 
-    // Apply the steering first, then the spin
-    wheelFL.quaternion.copy(steerQ).multiply(spinQ);
-    wheelFR.quaternion.copy(steerQ).multiply(spinQ);
+      // Apply the steering first, then the spin
+      wheelFL.quaternion.copy(steerQ).multiply(spinQ);
+      wheelFR.quaternion.copy(steerQ).multiply(spinQ);
+    }
 
     // Update car position and orientation
     const forward = new THREE.Vector3(
-      -Math.sin(physics.orientation), // Flipped sign
+      selectedCar.yFlipped ? -Math.sin(physics.orientation) : Math.sin(physics.orientation),
       0,
-      -Math.cos(physics.orientation) // Flipped sign
+      selectedCar.yFlipped ? -Math.cos(physics.orientation) : Math.cos(physics.orientation)
     );
 
     // Move car based on velocity and orientation
@@ -183,7 +196,7 @@ function createVehiclePhysics(): VehiclePhysics {
   return {
     velocity: 0,
     acceleration: 0,
-    orientation: Math.PI, // Facing sun initially
+    orientation: selectedCar.yFlipped ? Math.PI / 2 : 0,
     steering: 0,
     accelerationRate: 7, // Units per second squared
     brakeRate: 25, // Units per second squared
@@ -252,15 +265,19 @@ function updateVehiclePhysics(
 }
 
 const createCarModel = async (): Promise<CarModel> => {
-  const gltf = await loadModel('ferrari.glb');
+  const gltf = await loadModel(selectedCar.fileName);
 
   const carModel = gltf.scene.children[0] as CarModel;
 
   // Initialize wheel rotations
   const wheelFL = carModel.getObjectByName('wheel_fl');
+  if (wheelFL) {
+    wheelFL.userData.spinRotation = 0;
+  }
   const wheelFR = carModel.getObjectByName('wheel_fr');
-  wheelFL.userData.spinRotation = 0;
-  wheelFR.userData.spinRotation = 0;
+  if (wheelFR) {
+    wheelFR.userData.spinRotation = 0;
+  }
 
   // body material
   const bodyMaterial = new THREE.MeshPhysicalMaterial({
@@ -270,7 +287,10 @@ const createCarModel = async (): Promise<CarModel> => {
     clearcoat: 1.0,
     clearcoatRoughness: 0.03,
   });
-  carModel.getObjectByName('body').material = bodyMaterial;
+  const body = carModel.getObjectByName('body');
+  if (body) {
+    body.material = bodyMaterial;
+  }
 
   // details material
   const detailsMaterial = new THREE.MeshStandardMaterial({
@@ -279,7 +299,10 @@ const createCarModel = async (): Promise<CarModel> => {
     roughness: 0.5,
   });
   for (const key of ['rim_fl', 'rim_fr', 'rim_rr', 'rim_rl', 'trim'] as CarModelObjetKey[]) {
-    carModel.getObjectByName(key).material = detailsMaterial;
+    const rim = carModel.getObjectByName(key);
+    if (rim) {
+      rim.material = detailsMaterial;
+    }
   }
 
   // glass material
@@ -289,7 +312,10 @@ const createCarModel = async (): Promise<CarModel> => {
     roughness: 0,
     transmission: 1.0,
   });
-  carModel.getObjectByName('glass').material = glassMaterial;
+  const glass = carModel.getObjectByName('glass');
+  if (glass) {
+    glass.material = glassMaterial;
+  }
 
   // shadow
   const shadow = new THREE.TextureLoader().load('models/ferrari_ao.png');

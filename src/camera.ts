@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { selectedCar } from './3d-objects/car';
 
 export interface CameraController {
   update: () => void;
@@ -17,12 +18,12 @@ export function createCamera(): CameraController {
   camera.position.set(0, 2, 5);
   camera.lookAt(0, 0, 0);
 
-  // Camera settings
+  // Camera settings // FIXME depends on car yFlipped
   const settings = {
     mode: 'follow' as 'follow' | 'orbit',
-    distance: 8, // Negative distance to position behind car
+    distance: selectedCar.yFlipped ? 8 : -8, // Distance behind the car
     height: 6, // Height above car
-    lookAhead: -8, // Negative value to look ahead of car from behind
+    lookAhead: selectedCar.yFlipped ? -8 : 8, // what distance ahead of the car to look at
   };
 
   // Orbit controls for free camera mode
