@@ -13,7 +13,7 @@ import { checkCollisions } from './collisions';
 import { addBonus, loadBonus } from './3d-objects/bonus';
 import { updateGui } from './gui';
 import { addStreetItems, loadStreetItems } from './3d-objects/street-items';
-
+import { KnockbackManager } from './knockback';
 const isSwitchToNightEnabled = true;
 const forceNightTime = false; // for testing purposes
 
@@ -24,6 +24,8 @@ const cameraController = createCamera();
 const controls = createControls();
 
 const scene = new THREE.Scene();
+
+const knockbackManager = new KnockbackManager();
 
 const texturePromise = loadTexture('red-sky-at-night-cirrostratus-skydome_1K.exr').then(
   (texture) => {
@@ -121,15 +123,21 @@ const animate = () => {
   if (collisionCar) {
     // simple collision response: stop the car
     console.log('Collision detected! Stopping the car.');
+    // Calculate knockback direction (away from player car)
+    const knockbackDir = collisionCar.position.clone().sub(car.model.position);
+    knockbackManager.applyKnockback(collisionCar, knockbackDir, 100);
     // remove collision car from otherCars to avoid multiple collision detections
-    setTimeout(() => collisionCar.removeFromParent(), 500);
+    setTimeout(() => collisionCar.removeFromParent(), 1500);
     otherCars = otherCars.filter((c) => c !== collisionCar);
     car.collide();
   }
   const streetItemCollision = checkCollisions(car.model, streetItems);
   if (streetItemCollision) {
     console.log('Collision with street item detected!');
-    streetItemCollision.removeFromParent();
+    // Calculate knockback direction (away from player car)
+    const knockbackDir = streetItemCollision.position.clone().sub(car.model.position);
+    knockbackManager.applyKnockback(streetItemCollision, knockbackDir, 200);
+    setTimeout(() => streetItemCollision.removeFromParent(), 500);
     streetItems = streetItems.filter((item) => item !== streetItemCollision);
     if (streetItemCollision.name !== 'Traffic_Cone') {
       car.collide();
@@ -147,6 +155,9 @@ const animate = () => {
     bonusCount += 1;
   }
   bonus.forEach((b) => b.rotateY(deltaTime)); // simple rotation animation
+
+  // Update knockback objects
+  knockbackManager.update(deltaTime);
 
   car.update(deltaTime, controls);
 
