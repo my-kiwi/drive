@@ -132,9 +132,14 @@ const animate = () => {
   if (streetItemCollision) {
     console.log('Collision with street item detected!');
     // Calculate knockback direction (away from player car)
-    const knockbackDir = streetItemCollision.position.clone().sub(car.model.position);
-    knockbackManager.applyKnockback(streetItemCollision, knockbackDir, 200);
-    if (streetItemCollision.name !== 'Traffic_Cone') {
+    if (streetItemCollision.name === 'Trees_') {
+      const knockbackDir = car.model.position.clone().sub(streetItemCollision.position);
+      knockbackManager.applyKnockback(car.model, knockbackDir, 50, false);
+    } else {
+      const knockbackDir = streetItemCollision.position.clone().sub(car.model.position);
+      knockbackManager.applyKnockback(streetItemCollision, knockbackDir, 200);
+    }
+    if (streetItemCollision.name !== 'Traffic_Cone' && streetItemCollision.name !== 'Barrier_2') {
       car.collide();
     }
   }

@@ -9,13 +9,18 @@ interface KnockbackData {
 export class KnockbackManager {
   private knockbackObjects = new Map<THREE.Object3D, KnockbackData>();
 
-  applyKnockback(object: THREE.Object3D, direction: THREE.Vector3, baseForce: number) {
+  applyKnockback(
+    object: THREE.Object3D,
+    direction: THREE.Vector3,
+    baseForce: number,
+    rotate = true
+  ) {
     // Scale force proportionally to car speed (normalize by max speed and add base multiplier)
     const speedFactor = Math.max(0.1, carState.physics.velocity / 30);
     const force = baseForce * speedFactor;
     const velocity = direction.normalize().multiplyScalar(force);
     // Random rotation axes and speeds, scaled by speed
-    const angularVelocity = (Math.random() - 0.5) * 50 * speedFactor;
+    const angularVelocity = rotate ? (Math.random() - 0.5) * 50 * speedFactor : 0;
     this.knockbackObjects.set(object, { velocity, angularVelocity });
   }
 
