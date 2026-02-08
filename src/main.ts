@@ -85,14 +85,20 @@ let lastTime = performance.now();
 const startTime = lastTime;
 let elapsedSeconds = 0;
 let isPaused = false;
+let totalPausedTime = 0;
+let pauseStartTime = 0;
 
 // Pause game when window loses focus
 window.addEventListener('blur', () => {
   isPaused = true;
+  pauseStartTime = performance.now();
   lastTime = performance.now(); // Reset lastTime to avoid large deltaTime on resume
 });
 
 window.addEventListener('focus', () => {
+  if (isPaused) {
+    totalPausedTime += performance.now() - pauseStartTime;
+  }
   isPaused = false;
 });
 
@@ -118,7 +124,7 @@ const animate = () => {
     return;
   }
 
-  elapsedSeconds = (currentTime - startTime) / 1000;
+  elapsedSeconds = (currentTime - startTime - totalPausedTime) / 1000;
   logCarPosition();
 
   if (isSwitchToNightEnabled || forceNightTime) {
