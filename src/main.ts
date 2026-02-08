@@ -126,9 +126,6 @@ const animate = () => {
     // Calculate knockback direction (away from player car)
     const knockbackDir = collisionCar.position.clone().sub(car.model.position);
     knockbackManager.applyKnockback(collisionCar, knockbackDir, 100);
-    // remove collision car from otherCars to avoid multiple collision detections
-    setTimeout(() => collisionCar.removeFromParent(), 1500);
-    otherCars = otherCars.filter((c) => c !== collisionCar);
     car.collide();
   }
   const streetItemCollision = checkCollisions(car.model, streetItems);
@@ -137,8 +134,6 @@ const animate = () => {
     // Calculate knockback direction (away from player car)
     const knockbackDir = streetItemCollision.position.clone().sub(car.model.position);
     knockbackManager.applyKnockback(streetItemCollision, knockbackDir, 200);
-    setTimeout(() => streetItemCollision.removeFromParent(), 500);
-    streetItems = streetItems.filter((item) => item !== streetItemCollision);
     if (streetItemCollision.name !== 'Traffic_Cone') {
       car.collide();
     }
