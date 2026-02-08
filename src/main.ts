@@ -122,7 +122,7 @@ const animate = () => {
     // simple collision response: stop the car
     console.log('Collision detected! Stopping the car.');
     // remove collision car from otherCars to avoid multiple collision detections
-    collisionCar.removeFromParent();
+    setTimeout(() => collisionCar.removeFromParent(), 500);
     otherCars = otherCars.filter((c) => c !== collisionCar);
     car.collide();
   }
