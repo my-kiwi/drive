@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { selectedCar } from './3d-objects/car';
+import { selectedCar, carState } from './3d-objects/car';
 
 export interface CameraController {
   update: () => void;
@@ -17,13 +17,14 @@ export function createCamera(): CameraController {
   // Initial position
   camera.position.set(0, 2, 5);
   camera.lookAt(0, 0, 0);
+  const distance = 8; // Distance behind the car
 
   // Camera settings // FIXME depends on car yFlipped
   const settings = {
     mode: 'follow' as 'follow' | 'orbit',
-    distance: selectedCar.yFlipped ? 8 : -8, // Distance behind the car
-    height: 6, // Height above car
-    lookAhead: selectedCar.yFlipped ? -8 : 8, // what distance ahead of the car to look at
+    distance: selectedCar.yFlipped ? distance : -distance, // Distance behind the car
+    height: 5, // Height above car
+    lookAhead: selectedCar.yFlipped ? -distance : distance, // what distance ahead of the car to look at
   };
 
   // Orbit controls for free camera mode
@@ -47,10 +48,16 @@ export function createCamera(): CameraController {
     const targetDir = new THREE.Vector3(0, 0, 1).applyQuaternion(target.quaternion);
 
     // Calculate desired camera position (behind and above target)
+    const carSpeed = carState.physics.velocity / 50; // Normalize speed for camera distance adjustment
+
+    // normalize speed, so that minimum speed is bigger and maximum speed is smaller, to prevent camera from zooming in too much or too far out
+    const normalizedSpeed = Math.log(carSpeed + 2);
+    const speedFactor = Math.min(Math.max(normalizedSpeed, 0.5), 1.2);
+    const distance = settings.distance * speedFactor;
     const idealOffset = new THREE.Vector3(
-      targetDir.x * settings.distance, // Removed negative sign
-      settings.height,
-      targetDir.z * settings.distance // Removed negative sign
+      targetDir.x * distance,
+      settings.height * speedFactor, // Add some height based on speed
+      targetDir.z * distance
     );
     const idealPosition = targetPos.clone().add(idealOffset);
 

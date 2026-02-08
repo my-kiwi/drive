@@ -24,6 +24,10 @@ export const carConfig = {
   maxSpeed: 80, // units per second
 };
 
+export const carState = {
+  physics: createVehiclePhysics(),
+};
+
 type CarModelObjetKey =
   | 'body'
   | 'glass'
@@ -84,7 +88,6 @@ const addHeadlights = (carModel: CarModel) => {
 export const createCar = async () => {
   const model = await createCarModel();
   const headlights = addHeadlights(model);
-  const physics = createVehiclePhysics();
   let collided = false;
   let collisionTime = 0;
   const collisionDuration = 0.5; // seconds to recover from collision
@@ -95,7 +98,7 @@ export const createCar = async () => {
       collided = true;
       collisionTime = 0;
       // Apply sudden deceleration
-      physics.velocity *= 0.3; // lose 70% of velocity instantly
+      carState.physics.velocity *= 0.3; // lose 70% of velocity instantly
     }
   };
   const update = (deltaTime: number, controls: Controls) => {
@@ -104,12 +107,13 @@ export const createCar = async () => {
       collisionTime += deltaTime;
       if (collisionTime < collisionDuration) {
         // Continue braking during collision recovery period
-        physics.velocity -= Math.sign(physics.velocity) * impactDeceleration * deltaTime;
+        carState.physics.velocity -=
+          Math.sign(carState.physics.velocity) * impactDeceleration * deltaTime;
         // Tilt the car during impact for visual effect
         model.rotation.z = Math.sin((collisionTime * Math.PI) / collisionDuration) * 0.05;
         // Stop completely before exiting collision state
-        if (Math.abs(physics.velocity) < 0.1) {
-          physics.velocity = 0;
+        if (Math.abs(carState.physics.velocity) < 0.1) {
+          carState.physics.velocity = 0;
         }
       } else {
         // Collision recovery complete
@@ -119,7 +123,7 @@ export const createCar = async () => {
       return; // Don't process normal movement during collision
     }
     // Update physics
-    updateVehiclePhysics(physics, controls, deltaTime);
+    updateVehiclePhysics(carState.physics, controls, deltaTime);
 
     // Get wheel references
     const wheelFL = model.getObjectByName('wheel_fl');
@@ -129,7 +133,8 @@ export const createCar = async () => {
 
     // Calculate wheel rotation based on velocity
     const wheelCircumference = 0.5;
-    const rotationAngle = physics.velocity * deltaTime * ((Math.PI * 2) / wheelCircumference);
+    const rotationAngle =
+      carState.physics.velocity * deltaTime * ((Math.PI * 2) / wheelCircumference);
 
     // Create quaternions for our rotations
     const spinQ = new THREE.Quaternion(); // For wheel spinning (forward/backward)
@@ -147,7 +152,7 @@ export const createCar = async () => {
       // Front wheels: combine steering and spinning
       // Set up rotation quaternions
       spinQ.setFromAxisAngle(new THREE.Vector3(1, 0, 0), wheelFL.userData.spinRotation);
-      steerQ.setFromAxisAngle(new THREE.Vector3(0, 1, 0), physics.steering);
+      steerQ.setFromAxisAngle(new THREE.Vector3(0, 1, 0), carState.physics.steering);
 
       // Apply the steering first, then the spin
       wheelFL.quaternion.copy(steerQ).multiply(spinQ);
@@ -156,14 +161,18 @@ export const createCar = async () => {
 
     // Update car position and orientation
     const forward = new THREE.Vector3(
-      selectedCar.yFlipped ? -Math.sin(physics.orientation) : Math.sin(physics.orientation),
+      selectedCar.yFlipped
+        ? -Math.sin(carState.physics.orientation)
+        : Math.sin(carState.physics.orientation),
       0,
-      selectedCar.yFlipped ? -Math.cos(physics.orientation) : Math.cos(physics.orientation)
+      selectedCar.yFlipped
+        ? -Math.cos(carState.physics.orientation)
+        : Math.cos(carState.physics.orientation)
     );
 
     // Move car based on velocity and orientation
-    model.position.add(forward.multiplyScalar(physics.velocity * deltaTime));
-    model.rotation.y = physics.orientation;
+    model.position.add(forward.multiplyScalar(carState.physics.velocity * deltaTime));
+    model.rotation.y = carState.physics.orientation;
   };
   const switchHeadlights = (on: boolean) => {
     headlights.forEach((light) => {
