@@ -13,6 +13,12 @@ export const createRenderer = () => {
   renderer.toneMappingExposure = Constants.RENDERER_EXPOSURE.HIGH;
   // renderer.shadowMap.enabled = true;
   // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
   return renderer;
 };
 
