@@ -84,6 +84,17 @@ window.addEventListener('keydown', (e) => {
 let lastTime = performance.now();
 const startTime = lastTime;
 let elapsedSeconds = 0;
+let isPaused = false;
+
+// Pause game when window loses focus
+window.addEventListener('blur', () => {
+  isPaused = true;
+  lastTime = performance.now(); // Reset lastTime to avoid large deltaTime on resume
+});
+
+window.addEventListener('focus', () => {
+  isPaused = false;
+});
 
 let lastLoggedSecond = -1;
 const logCarPosition = () => {
@@ -100,6 +111,13 @@ const animate = () => {
   const currentTime = performance.now();
   const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
   lastTime = currentTime;
+
+  if (isPaused) {
+    // Continue rendering but don't update game state
+    renderer.render(scene, cameraController.camera);
+    return;
+  }
+
   elapsedSeconds = (currentTime - startTime) / 1000;
   logCarPosition();
 
