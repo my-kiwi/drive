@@ -110,6 +110,25 @@ main {
   cursor: pointer;
 }
 
+/* Car Color Picker */
+.color-picker-container {
+  display: flex;
+  align-items: center;
+}
+
+.car-color-picker {
+  width: 48px;
+  height: 48px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.car-color-picker:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
 /* Loading Bar */
 .loading-container {
   position: fixed;

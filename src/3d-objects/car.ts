@@ -66,8 +66,8 @@ const addHeadlights = (carModel: CarModel) => {
   return [headlightLeft, headlightRight, backlightLeft, backlightRight];
 };
 
-export const createCar = async () => {
-  const model = await createCarModel();
+export const createCar = async (bodyColor?: number) => {
+  const { model, changeColor } = await createCarModel(bodyColor);
   const headlights = addHeadlights(model);
   let collided = false;
   let collisionTime = 0;
@@ -128,6 +128,7 @@ export const createCar = async () => {
     update,
     collide,
     switchHeadlights,
+    changeColor,
   };
 };
 
@@ -216,7 +217,7 @@ function updateVehiclePhysics(
   physics.orientation += (physics.steering * physics.velocity * deltaTime) / turnRadius;
 }
 
-const createCarModel = async (): Promise<CarModel> => {
+const createCarModel = async (bodyColor?: number) => {
   const gltf = await loadModel(selectedCar.fileName);
 
   const carModel = gltf.scene.children[0] as CarModel;
@@ -224,7 +225,7 @@ const createCarModel = async (): Promise<CarModel> => {
 
   // body material
   const bodyMaterial = new THREE.MeshPhysicalMaterial({
-    color: 0xff0000,
+    color: bodyColor ?? 0xff0000,
     metalness: 1,
     roughness: 0.5,
     clearcoat: 1.0,
@@ -233,6 +234,11 @@ const createCarModel = async (): Promise<CarModel> => {
   const body = carModel.getObjectByName('JDM_Body') as THREE.Mesh;
   const meshes = getMeshes(body);
   console.log('Car meshes:', meshes);
+
+  const changeColor = (numColor: number) => {
+    bodyMaterial.color.setHex(numColor);
+  };
+
   meshes.Paint.material = bodyMaterial;
 
   // glass material
@@ -248,7 +254,10 @@ const createCarModel = async (): Promise<CarModel> => {
   carModel.scale.set(1, 1, 1);
   carModel.position.set(carConfig.position.x, carConfig.position.y, carConfig.position.z);
 
-  return carModel;
+  return {
+    model: carModel,
+    changeColor,
+  };
 };
 
 const getMeshes = (car: CarModel): Record<string, THREE.Mesh> =>

@@ -15,6 +15,7 @@ import { updateGui } from './gui';
 import { addStreetItems, loadStreetItems } from './3d-objects/street-items';
 import { KnockbackManager } from './knockback';
 import { displayAssetsLoadingProgress } from './utils/assets-loading-progress';
+import { getSavedCarColor, setupColorPicker } from './utils/color-picker';
 const isSwitchToNightEnabled = true;
 const forceNightTime = false; // for testing purposes
 
@@ -45,7 +46,9 @@ const roadPromise = createRoad().then((road) => {
   scene.add(road);
 });
 
-const carPromise = createCar().then((car) => {
+const carColor = getSavedCarColor();
+
+const carPromise = createCar(carColor).then((car) => {
   car.switchHeadlights(false);
   scene.add(car.model);
   cameraController.setTarget(car.model);
@@ -70,6 +73,10 @@ const assetPromises = [
 displayAssetsLoadingProgress(...assetPromises);
 
 const [car] = await Promise.all(assetPromises);
+
+setupColorPicker((newColor) => {
+  car.changeColor(newColor);
+});
 
 let otherCars = buildOtherCars();
 let bonus = addBonus(scene);
