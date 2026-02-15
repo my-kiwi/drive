@@ -5,11 +5,9 @@ import { loadModel } from '../utils/model-loader';
 
 type CarSetup = {
   fileName: string;
-  yFlipped: boolean;
 };
 const cars = [
-  { fileName: 'jdm-car.glb', yFlipped: false }, // credits: https://www.blenderkit.com/asset-gallery-detail/ab0b231a-8351-422f-b55f-108faa77641d/
-  { fileName: 'ferrari.glb', yFlipped: true }, // FIXME comes from threejs example, not sure if I will keep it
+  { fileName: 'jdm-car.glb' }, // credits: https://www.blenderkit.com/asset-gallery-detail/ab0b231a-8351-422f-b55f-108faa77641d/
 ];
 
 // TODO allow car selection
@@ -28,34 +26,17 @@ export const carState = {
   physics: createVehiclePhysics(),
 };
 
-type CarModelObjetKey =
-  | 'body'
-  | 'glass'
-  | 'rim_fl'
-  | 'rim_fr'
-  | 'rim_rl'
-  | 'rim_rr'
-  | 'trim'
-  | 'wheel_fl' // front left
-  | 'wheel_fr' // front right
-  | 'wheel_rl' // rear left
-  | 'wheel_rr'; // rear right
-
-type CarModel = Omit<THREE.Object3D<THREE.Object3DEventMap>, 'getObjectByName'> & {
-  // "key" is defined but never used => it's a type definition stupid linter
-  // eslint-disable-next-line no-unused-vars
-  getObjectByName(key: CarModelObjetKey): THREE.Mesh | undefined;
-};
+type CarModel = THREE.Object3D<THREE.Object3DEventMap>;
 
 const addHeadlights = (carModel: CarModel) => {
   // feux de route qui illuminent la route
   const createSpotlight = () => {
     const spotlight = new THREE.SpotLight(0xffeeaa, 5000, 1000, Math.PI / 8, 0.5, 2);
     spotlight.position.y = 1.2;
-    spotlight.position.z = selectedCar.yFlipped ? -1.2 : 1.2;
+    spotlight.position.z = 1.2;
 
     spotlight.target.position.y = 0.1;
-    spotlight.target.position.z = selectedCar.yFlipped ? -60 : 60;
+    spotlight.target.position.z = 60;
 
     // spotlight.rotation.z = -Math.PI / 2;
     return spotlight;
@@ -73,7 +54,7 @@ const addHeadlights = (carModel: CarModel) => {
   const createBacklight = () => {
     const backlight = new THREE.RectAreaLight(0xff0000, 500, 0.1, 0.1);
     backlight.position.y = 0.5;
-    backlight.position.z = selectedCar.yFlipped ? 2.0 : -2.0;
+    backlight.position.z = -2.0;
     return backlight;
   };
   const backlightLeft = createBacklight();
@@ -125,49 +106,11 @@ export const createCar = async () => {
     // Update physics
     updateVehiclePhysics(carState.physics, controls, deltaTime);
 
-    // Get wheel references
-    const wheelFL = model.getObjectByName('wheel_fl');
-    const wheelFR = model.getObjectByName('wheel_fr');
-    const wheelRL = model.getObjectByName('wheel_rl');
-    const wheelRR = model.getObjectByName('wheel_rr');
-
-    // Calculate wheel rotation based on velocity
-    const wheelCircumference = 0.5;
-    const rotationAngle =
-      carState.physics.velocity * deltaTime * ((Math.PI * 2) / wheelCircumference);
-
-    // Create quaternions for our rotations
-    const spinQ = new THREE.Quaternion(); // For wheel spinning (forward/backward)
-    const steerQ = new THREE.Quaternion(); // For wheel steering (left/right)
-
-    if (wheelFL && wheelFR && wheelRL && wheelRR) {
-      // Apply rotations to rear wheels (only spin, no steering)
-      wheelRL.rotation.x -= rotationAngle;
-      wheelRR.rotation.x -= rotationAngle;
-
-      // Update accumulated spin for front wheels
-      wheelFL.userData.spinRotation = (wheelFL.userData.spinRotation || 0) - rotationAngle;
-      wheelFR.userData.spinRotation = (wheelFR.userData.spinRotation || 0) - rotationAngle;
-
-      // Front wheels: combine steering and spinning
-      // Set up rotation quaternions
-      spinQ.setFromAxisAngle(new THREE.Vector3(1, 0, 0), wheelFL.userData.spinRotation);
-      steerQ.setFromAxisAngle(new THREE.Vector3(0, 1, 0), carState.physics.steering);
-
-      // Apply the steering first, then the spin
-      wheelFL.quaternion.copy(steerQ).multiply(spinQ);
-      wheelFR.quaternion.copy(steerQ).multiply(spinQ);
-    }
-
     // Update car position and orientation
     const forward = new THREE.Vector3(
-      selectedCar.yFlipped
-        ? -Math.sin(carState.physics.orientation)
-        : Math.sin(carState.physics.orientation),
+      Math.sin(carState.physics.orientation),
       0,
-      selectedCar.yFlipped
-        ? -Math.cos(carState.physics.orientation)
-        : Math.cos(carState.physics.orientation)
+      Math.cos(carState.physics.orientation)
     );
 
     // Move car based on velocity and orientation
@@ -205,7 +148,7 @@ function createVehiclePhysics(): VehiclePhysics {
   return {
     velocity: 0,
     acceleration: 0,
-    orientation: selectedCar.yFlipped ? Math.PI / 2 : 0,
+    orientation: 0,
     steering: 0,
     accelerationRate: 7, // Units per second squared
     brakeRate: 25, // Units per second squared
@@ -277,16 +220,7 @@ const createCarModel = async (): Promise<CarModel> => {
   const gltf = await loadModel(selectedCar.fileName);
 
   const carModel = gltf.scene.children[0] as CarModel;
-
-  // Initialize wheel rotations
-  const wheelFL = carModel.getObjectByName('wheel_fl');
-  if (wheelFL) {
-    wheelFL.userData.spinRotation = 0;
-  }
-  const wheelFR = carModel.getObjectByName('wheel_fr');
-  if (wheelFR) {
-    wheelFR.userData.spinRotation = 0;
-  }
+  console.log('Car model loaded:', carModel);
 
   // body material
   const bodyMaterial = new THREE.MeshPhysicalMaterial({
@@ -296,51 +230,19 @@ const createCarModel = async (): Promise<CarModel> => {
     clearcoat: 1.0,
     clearcoatRoughness: 0.03,
   });
-  const body = carModel.getObjectByName('body');
-  if (body) {
-    body.material = bodyMaterial;
-  }
-
-  // details material
-  const detailsMaterial = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    metalness: 1.0,
-    roughness: 0.5,
-  });
-  for (const key of ['rim_fl', 'rim_fr', 'rim_rr', 'rim_rl', 'trim'] as CarModelObjetKey[]) {
-    const rim = carModel.getObjectByName(key);
-    if (rim) {
-      rim.material = detailsMaterial;
-    }
-  }
+  const body = carModel.getObjectByName('JDM_Body') as THREE.Mesh;
+  const meshes = getMeshes(body);
+  console.log('Car meshes:', meshes);
+  meshes.Paint.material = bodyMaterial;
 
   // glass material
   const glassMaterial = new THREE.MeshPhysicalMaterial({
-    color: 0xffffff,
-    metalness: 0.25,
+    color: 0xaaaaaa,
+    metalness: 1,
     roughness: 0,
-    transmission: 1.0,
+    transmission: 0.9,
   });
-  const glass = carModel.getObjectByName('glass');
-  if (glass) {
-    glass.material = glassMaterial;
-  }
-
-  // shadow
-  const shadow = new THREE.TextureLoader().load('models/ferrari_ao.png');
-  const mesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.655 * 4, 1.3 * 4),
-    new THREE.MeshBasicMaterial({
-      map: shadow,
-      blending: THREE.MultiplyBlending,
-      toneMapped: false,
-      transparent: true,
-      premultipliedAlpha: true,
-    })
-  );
-  mesh.rotation.x = -Math.PI / 2;
-  mesh.renderOrder = 2;
-  carModel.add(mesh);
+  meshes.Glass.material = glassMaterial;
 
   // scale and position
   carModel.scale.set(1, 1, 1);
@@ -348,3 +250,16 @@ const createCarModel = async (): Promise<CarModel> => {
 
   return carModel;
 };
+
+const getMeshes = (car: CarModel): Record<string, THREE.Mesh> =>
+  car.children
+    .map((child) => child as THREE.Mesh)
+    .filter((child) => !!child.material)
+    .reduce(
+      (acc, child) => {
+        const name = (child.material as any).name;
+        acc[name] = child;
+        return acc;
+      },
+      {} as Record<string, THREE.Mesh>
+    );

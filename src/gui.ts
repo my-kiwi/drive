@@ -1,7 +1,6 @@
 import { Constants } from './constants';
 import { getRenderer } from './renderer';
 
-
 let gameOver = false;
 
 export const updateGui = (elapsedSeconds: number, bonusCount: number) => {
