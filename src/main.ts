@@ -14,6 +14,7 @@ import { addBonus, loadBonus } from './3d-objects/bonus';
 import { updateGui } from './gui';
 import { addStreetItems, loadStreetItems } from './3d-objects/street-items';
 import { KnockbackManager } from './knockback';
+import { displayAssetsLoadingProgress } from './utils/assets-loading-progress';
 const isSwitchToNightEnabled = true;
 const forceNightTime = false; // for testing purposes
 
@@ -56,8 +57,7 @@ const bonusPromise = loadBonus();
 
 const streetItemsPromise = loadStreetItems();
 
-// TODO add loading screen while promises are pending
-const [car] = await Promise.all([
+const assetPromises = [
   carPromise,
   groundPromise,
   roadPromise,
@@ -65,7 +65,11 @@ const [car] = await Promise.all([
   bonusPromise,
   malusPromise,
   streetItemsPromise,
-]);
+] as const;
+
+displayAssetsLoadingProgress(...assetPromises);
+
+const [car] = await Promise.all(assetPromises);
 
 let otherCars = buildOtherCars();
 let bonus = addBonus(scene);
