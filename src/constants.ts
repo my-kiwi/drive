@@ -7,4 +7,6 @@ export const Constants = {
     NIGHTFALL: 1,
   },
   NIGHTFALL_DIVISION_FACTOR: 30, // the higher, the slower the transition to night
+  GAME_DURATION: 90, // seconds
+  SCORE_MULTIPLIER: 10,
 };

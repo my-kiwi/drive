@@ -1,14 +1,14 @@
+import { Constants } from './constants';
 import { getRenderer } from './renderer';
 
-const GAME_DURATION = 90; // seconds
-const SCORE_MULTIPLIER = 10;
+
 let gameOver = false;
 
 export const updateGui = (elapsedSeconds: number, bonusCount: number) => {
-  const score = bonusCount * SCORE_MULTIPLIER;
+  const score = bonusCount * Constants.SCORE_MULTIPLIER;
   // update timer display and check for end of game
   if (timerEl && !gameOver) {
-    const remaining = GAME_DURATION - elapsedSeconds;
+    const remaining = Constants.GAME_DURATION - elapsedSeconds;
     timerEl.innerText = formatTime(remaining > 0 ? remaining : 0);
     if (remaining <= 0) {
       // game over
