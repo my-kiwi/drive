@@ -7,6 +7,5 @@
     }
   },
   "forwardPorts": [3000],
-  "workspaceFolder": "/workspaces",
   "shutdownAction": "stopContainer"
 }
